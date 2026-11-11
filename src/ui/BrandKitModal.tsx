@@ -10,6 +10,7 @@ import {
   WHITE_LABEL_SEGMENT_PRESETS,
 } from '../core/businessRules';
 import { tightCropAlphaDataUrl } from '../engine/exporter';
+import { CoagroPetLogo, LogoHorizontalAzul } from './coagroLogos';
 
 interface BrandKitModalProps {
   isOpen: boolean;
@@ -19,12 +20,11 @@ interface BrandKitModalProps {
 }
 
 const DEPARTMENT_ICONS: { key: string; emoji: string; label: string }[] = [
-  { key: 'leaf', emoji: '🌿', label: 'Agro / Horti' },
-  { key: 'heart', emoji: '🐾', label: 'Pet / Vet' },
-  { key: 'meat', emoji: '🥩', label: 'Açougue / Frios' },
-  { key: 'cart', emoji: '🛒', label: 'Mercearia' },
-  { key: 'pill', emoji: '💊', label: 'Farmácia' },
-  { key: 'tool', emoji: '🛠️', label: 'Construção' },
+  { key: 'leaf', emoji: '🌿', label: 'Agro' },
+  { key: 'heart', emoji: '🐾', label: 'Pet' },
+  { key: 'pill', emoji: '💉', label: 'Veterinária' },
+  { key: 'irrigation', emoji: '💧', label: 'Irrigação' },
+  { key: 'tool', emoji: '🚜', label: 'Máquinas & Ferramentas' },
 ];
 
 export const BrandKitModal: React.FC<BrandKitModalProps> = ({
@@ -36,6 +36,8 @@ export const BrandKitModal: React.FC<BrandKitModalProps> = ({
   if (!isOpen) return null;
 
   const embedded = variant === 'embedded';
+  const activeIdentityIsPet = brandKit.activeDepartmentId === 'dept-2';
+  const allowLogoUpload = false;
 
   const [logoRemoveBg, setLogoRemoveBg] = React.useState(true);
   const [rawLogoDataUrl, setRawLogoDataUrl] = React.useState<string | null>(null);
@@ -141,7 +143,7 @@ export const BrandKitModal: React.FC<BrandKitModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-extrabold uppercase text-slate-700 mb-1">
-                  Nome da Empresa / Rede <span className="text-red-500 font-bold">*</span>
+                  Nome do Grupo / Nossas Unidades <span className="text-red-500 font-bold">*</span>
                 </label>
                 <input
                   type="text"
@@ -214,176 +216,139 @@ export const BrandKitModal: React.FC<BrandKitModalProps> = ({
               <label className="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5">
                 Logotipo Oficial da Marca
               </label>
-              <div className="flex flex-col gap-2 p-3 rounded-xl border border-dashed border-slate-300 bg-slate-50">
+              <div className="flex flex-col gap-2 p-3 rounded-xl border border-[#002B49]/15 bg-[#f5f8fa]">
                 <div className="flex items-center gap-3">
-                  {brandKit.defaultLogoUrl ? (
-                    <div className="h-12 px-3 py-1 bg-white rounded-lg border border-slate-200 flex items-center justify-center shrink-0">
-                      <img
-                        src={brandKit.defaultLogoUrl}
-                        alt="Logo da Marca"
-                        className="max-h-10 max-w-[120px] object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-12 w-12 rounded-lg bg-slate-200/70 flex items-center justify-center text-lg shrink-0">
-                      🏷️
-                    </div>
-                  )}
-
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-800">
-                      {brandKit.defaultLogoUrl
-                        ? 'Logo anexada à marca'
-                        : 'Nenhuma logo enviada (usando nome em texto)'}
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      Formatos PNG ou JPG
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <label className="px-3 py-1.5 rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-extrabold cursor-pointer transition-colors">
-                      {brandKit.defaultLogoUrl ? 'Trocar Logo' : 'Enviar Logo'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="hidden"
-                      />
-                    </label>
-                    {brandKit.defaultLogoUrl && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={handleExtractLogoColors}
-                          title="Extrair cor primária e cor de destaque automaticamente da logo enviada"
-                          className="px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950"
-                        >
-                          🎨 Extrair Paleta
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            studioActions.updateBrandKit({
-                              defaultLogoUrl: undefined,
-                            })
-                          }
-                          className="px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-red-50 text-xs font-bold text-red-700"
-                        >
-                          Remover
-                        </button>
-                      </>
+                  <div className="flex h-14 min-w-[130px] items-center justify-center rounded-lg border border-slate-200 bg-white px-3">
+                    {activeIdentityIsPet ? (
+                      <CoagroPetLogo className="h-10 w-auto max-w-[118px]" />
+                    ) : (
+                      <LogoHorizontalAzul className="h-10 w-auto max-w-[118px]" />
                     )}
                   </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-800">
+                        {activeIdentityIsPet
+                          ? 'Logo Oficial Coagro Pet Ativa'
+                          : 'Logo Oficial Coagro Ativa'}
+                      </span>
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-emerald-800">
+                        Ativo homologado
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-500">
+                      Ativo oficial carregado pelo padrão do Hub Coagro.
+                    </div>
+                  </div>
+
+                  {allowLogoUpload && (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <label className="px-3 py-1.5 rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white text-xs font-extrabold cursor-pointer transition-colors">
+                        {brandKit.defaultLogoUrl ? 'Trocar Logo' : 'Enviar Logo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      {brandKit.defaultLogoUrl && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={handleExtractLogoColors}
+                            title="Extrair cor primária e cor de destaque automaticamente da logo enviada"
+                            className="px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950"
+                          >
+                            🎨 Extrair Paleta
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              studioActions.updateBrandKit({
+                                defaultLogoUrl: undefined,
+                              })
+                            }
+                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 hover:bg-red-50 text-xs font-bold text-red-700"
+                          >
+                            Remover
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {/* Micro-orientação e Toggle de Fundo */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-slate-200">
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={logoRemoveBg}
-                      onChange={(e) => handleToggleLogoBg(e.target.checked)}
-                      className="rounded border-slate-300 text-emerald-700 focus:ring-emerald-600"
-                    />
-                    <span className="text-xs font-bold text-slate-700">
-                      Remover fundo branco da logo automaticamente
+                {allowLogoUpload && (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-slate-200">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={logoRemoveBg}
+                        onChange={(e) => handleToggleLogoBg(e.target.checked)}
+                        className="rounded border-slate-300 text-emerald-700 focus:ring-emerald-600"
+                      />
+                      <span className="text-xs font-bold text-slate-700">
+                        Remover fundo branco da logo automaticamente
+                      </span>
+                    </label>
+                    <span className="text-[11px] text-slate-500 italic">
+                      Recomendado: envie arquivo PNG sem fundo para melhor acabamento.
                     </span>
-                  </label>
-                  <span className="text-[11px] text-slate-500 italic">
-                    Recomendado: envie arquivo PNG sem fundo para melhor acabamento.
-                  </span>
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Presets Rápidos de Segmento White-Label (1 Clique) */}
+            {/* Presets de segmento: constantes e ações preservadas, mas sem exposição no Hub oficial. */}
             <div className="pt-2">
               <label className="block text-[11px] font-extrabold uppercase text-slate-600 mb-1.5">
-                ⚡ Presets Rápidos de Segmento (Cores WCAG + Tipografia em 1 Clique)
+                Identidades oficiais do Hub
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {WHITE_LABEL_SEGMENT_PRESETS.map((seg) => (
-                  <button
-                    key={seg.id}
-                    type="button"
-                    onClick={() => studioActions.applySegmentPreset(seg.id)}
-                    className="p-2 rounded-xl border border-slate-200 hover:border-emerald-700 bg-slate-50 hover:bg-emerald-50/40 text-left transition-all flex flex-col gap-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">{seg.emoji}</span>
-                      <div className="flex items-center gap-1">
-                        <span
-                          style={{ backgroundColor: seg.dept1.primaryColorHex }}
-                          className="w-3 h-3 rounded-full border border-white shadow-2xs"
-                        />
-                        <span
-                          style={{ backgroundColor: seg.dept1.accentColorHex }}
-                          className="w-3 h-3 rounded-full border border-white shadow-2xs"
-                        />
-                        <span
-                          style={{ backgroundColor: seg.dept2.primaryColorHex }}
-                          className="w-3 h-3 rounded-full border border-white shadow-2xs"
-                        />
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-extrabold text-slate-800 leading-tight">
-                      {seg.label}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="rounded-xl border border-[#002B49]/20 bg-[#002B49]/5 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-black uppercase text-[#002B49]">Coagro</span>
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-800">
+                      Padrão principal
                     </span>
-                  </button>
-                ))}
+                  </div>
+                  <p className="mt-1 text-[10px] font-medium text-slate-500">
+                    Azul oficial, verde-safra e dourado institucional.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-[#001C71]/20 bg-[#001C71]/5 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-black uppercase text-[#001C71]">Coagro Pet</span>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase text-slate-600">
+                      Identidade secundária
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[10px] font-medium text-slate-500">
+                    Azul royal e azul celeste exclusivos das unidades Pet.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Seletor de Tipografia Oficial da Marca (Zero Hardcode) */}
+            {/* Par tipográfico travado: presets antigos preservados apenas para compatibilidade. */}
             <div className="pt-2">
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-[11px] font-extrabold uppercase text-slate-600">
-                  🔤 Par Tipográfico Homologado da Marca (Títulos & Preços + Rodapé)
-                </label>
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  Anti-Canva • Leitura 2m Garantida
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-[#002B49]/20 bg-[#f5f8fa] p-3">
+                <div>
+                  <div className="text-[11px] font-extrabold uppercase tracking-wide text-slate-600">
+                    Tipografia Oficial
+                  </div>
+                  <div className="mt-0.5 text-sm font-black text-slate-900">
+                    Exo 2 + Inter
+                  </div>
+                  <div className="text-[10px] font-medium text-slate-500">
+                    Padrão Oficial Coagro · títulos, preços, apoio e rodapé.
+                  </div>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-emerald-800">
+                  Travado
                 </span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {WHITE_LABEL_TYPOGRAPHY_PRESETS.map((preset) => {
-                  const isSelected =
-                    brandKit.typographyPresetId === preset.id ||
-                    brandKit.fontHeading === preset.fontHeading;
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => studioActions.applyTypographyPreset(preset.id)}
-                      data-typography-preset={preset.id}
-                      className={`p-2.5 rounded-xl border text-left transition-all ${
-                        isSelected
-                          ? 'border-emerald-900 bg-emerald-950/5 ring-2 ring-emerald-900/20'
-                          : 'border-slate-200 bg-white hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span
-                          style={{ fontFamily: preset.fontHeading }}
-                          className="text-xs font-black uppercase text-slate-900"
-                        >
-                          {preset.label}
-                        </span>
-                        {isSelected && (
-                          <span className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-900 text-white">
-                            Ativo
-                          </span>
-                        )}
-                      </div>
-                      <p
-                        style={{ fontFamily: preset.fontBody }}
-                        className="text-[10px] font-medium text-slate-500 mt-0.5"
-                      >
-                        {preset.segmentHint}
-                      </p>
-                    </button>
-                  );
-                })}
               </div>
             </div>
           </section>
@@ -393,10 +358,10 @@ export const BrandKitModal: React.FC<BrandKitModalProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
               <div>
                 <h3 className="text-xs font-black uppercase tracking-wider text-emerald-900">
-                  2. Subdepartamentos & Setores da Loja
+                  2. Identidades & Setores Oficiais da Operação
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Configure cores e setores específicos (Açougue, Pet, Agro, etc.)
+                  Coagro e Coagro Pet. Setores: Agro, Pet, Veterinária, Irrigação e Máquinas &amp; Ferramentas.
                 </p>
               </div>
               <label className="inline-flex items-center gap-2 cursor-pointer select-none bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
@@ -418,7 +383,12 @@ export const BrandKitModal: React.FC<BrandKitModalProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {brandKit.departments.map((dept, index) => {
+                {brandKit.departments
+                  .filter(
+                    (dept) =>
+                      dept.enabled !== false && (dept.id === 'dept-1' || dept.id === 'dept-2')
+                  )
+                  .map((dept, index) => {
                   const primaryTextHex = resolveAccessibleTextColor(
                     dept.primaryColorHex
                   );

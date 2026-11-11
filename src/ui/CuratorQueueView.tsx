@@ -46,6 +46,7 @@ const MODULE_LABELS: Record<ModuleMode, string> = {
   BANNER_FAIXA: 'Faixa / Lona / Gráfica',
   RADIO_SPOT: 'Spot Rádio Coagro',
   BRAND_HUB: 'Kit Corporativo / Marca',
+  CAMPAIGNS: 'Campanha / Mídia Oficial',
   CURATOR_QUEUE: 'Fila do Curador',
 };
 
@@ -133,7 +134,7 @@ export const CuratorQueueView: React.FC = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+    <div className="curator-page p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
       {/* Banner de Feedback */}
       {notice && (
         <div className="p-3.5 rounded-2xl bg-[#004d40] text-white text-xs font-bold flex items-center justify-between shadow-md">
@@ -149,7 +150,7 @@ export const CuratorQueueView: React.FC = () => {
       )}
 
       {/* Cabeçalho Executivo da Curadoria */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="curator-hero bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#004d40] text-[#ffab00]">
             Curadoria Centralizada • Marketing Coagro
@@ -158,7 +159,7 @@ export const CuratorQueueView: React.FC = () => {
             Fila Global de Demandas &amp; Homologação de Marca
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Auditoria centralizada de peças das 15 unidades (Grupo Coagro, Coagro Pet e RB Agrícola), cotações gráficas e spots da Rádio Coagro.
+            Auditoria centralizada de peças das 15 Unidades Coagro (Grupo Coagro e Coagro Pet), cotações gráficas e spots da Rádio Coagro.
           </p>
         </div>
 
@@ -221,7 +222,7 @@ export const CuratorQueueView: React.FC = () => {
       </div>
 
       {/* KPIs da Rede */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+      <div className="curator-ledger grid grid-cols-2 md:grid-cols-4 gap-3.5">
         <div className="bg-white p-4 rounded-2xl border border-slate-200">
           <span className="text-[11px] font-bold uppercase text-slate-500">Pendentes na Fila</span>
           <div className="text-2xl font-black text-amber-600 mt-1">{pendingCount}</div>

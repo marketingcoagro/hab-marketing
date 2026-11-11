@@ -37,7 +37,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
     );
 
     return (
-      <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+      <div className="special-page p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
         {notice && (
           <div className="p-3.5 rounded-2xl bg-[#004d40] text-white text-xs font-bold flex items-center justify-between shadow-md">
             <span>{notice}</span>
@@ -59,7 +59,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
                 Via Amarela • Cotação Gráfica Obrigatória
               </span>
               <h1 className="text-lg font-black text-slate-900 mt-1">
-                Módulo 2: Faixas, Banners e Lonas de Loja
+                Faixas, banners e lonas de loja
               </h1>
               <p className="text-xs text-slate-500">
                 Preencha as medidas da fachada ou evento. O sistema gera o gabarito proporcional e encaminha para cotação gráfica no Marketing.
@@ -206,7 +206,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
                     `✅ Solicitação ${req.protocolCode} enviada para Cotação Gráfica e Curadoria!`
                   );
                 }}
-                className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-xs cursor-pointer"
+                className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black shadow-xs cursor-pointer"
               >
                 📐 Solicitar Criação &amp; Cotação ao Marketing
               </button>
@@ -214,7 +214,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
           </div>
 
           {/* Coluna Direita: Mockup Proporcional Travado */}
-          <div className="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 flex flex-col justify-between space-y-4">
+          <div className="special-stage-card lg:col-span-7 rounded-3xl p-6 border border-slate-200 flex flex-col justify-between space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black uppercase text-slate-700">
                 Mockup Proporcional ({bannerFaixaDraft.widthCm}×{bannerFaixaDraft.heightCm}cm • {bannerFaixaDraft.quantity} un.)
@@ -228,10 +228,10 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
               <div
                 onContextMenu={(e) => e.preventDefault()}
                 style={{ aspectRatio: `${aspect} / 1` }}
-                className="w-full rounded-2xl bg-[#004d40] border-4 border-[#ffab00] p-6 text-white flex flex-col justify-between relative overflow-hidden shadow-lg select-none"
+                className="special-mockup w-full rounded-2xl bg-[#004d40] border-4 border-[#ffab00] p-6 text-white flex flex-col justify-between relative overflow-hidden shadow-lg select-none"
               >
                 {/* Marca d'água de revisão */}
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10 rotate-[-12deg] text-2xl font-black uppercase tracking-widest text-white">
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.045] rotate-[-12deg] text-2xl font-black uppercase tracking-widest text-white">
                   PREVIEW DE COTAÇÃO • {activeStore.nome}
                 </div>
 
@@ -282,13 +282,20 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
     const next = exists
       ? radioSpotDraft.targetStoreIds.filter((id) => id !== storeId)
       : [...radioSpotDraft.targetStoreIds, storeId];
+
+    if (radioSpotDraft.mentionStoreName !== false) {
+      const nextMentionedStoreId = exists ? next[0] || activeStore.id : storeId;
+      studioActions.setActiveStore(nextMentionedStoreId);
+      return;
+    }
+
     studioActions.updateRadioSpotDraft({
       targetStoreIds: next.length > 0 ? next : [activeStore.id],
     });
   };
 
   return (
-    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+    <div className="special-page p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
       {notice && (
         <div className="p-3.5 rounded-2xl bg-[#004d40] text-white text-xs font-bold flex items-center justify-between shadow-md">
           <span>{notice}</span>
@@ -310,7 +317,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
               Integração Rádio Coagro • Spotifast Server (:8790)
             </span>
             <h1 className="text-lg font-black text-slate-900 mt-1">
-              Módulo 5: Solicitação de Spot para Rádio Interna
+              Solicitação de spot para rádio interna
             </h1>
             <p className="text-xs text-slate-500">
               Estruture o aviso ou oferta para a programação musical das lojas (regra 2 músicas : 1 comercial).
@@ -411,6 +418,25 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
               />
             </div>
 
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={radioSpotDraft.mentionStoreName !== false}
+                  onChange={(e) => {
+                    studioActions.updateRadioSpotDraft({ mentionStoreName: e.target.checked });
+                  }}
+                  className="rounded border-slate-300 text-[#002B49] focus:ring-[#ffab00]"
+                />
+                <span>Mencionar o nome da minha loja no áudio?</span>
+              </label>
+              <p className="text-[11px] text-slate-500 mt-1 pl-6">
+                {radioSpotDraft.mentionStoreName !== false
+                  ? `Se ativado, a locução cita "Aqui na ${activeStore.nome}".`
+                  : 'Se desativado, a locução cita "todas as lojas do Grupo Coagro".'}
+              </p>
+            </div>
+
             <button
               type="button"
               onClick={() => {
@@ -427,7 +453,9 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
                 Lojas Alvo no Spotifast Server (`target_stores`)
               </label>
               <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 rounded-xl bg-slate-50 border border-slate-200">
-                {COAGRO_STORES.filter((s) => s.tipo === 'filial').map((st) => {
+                {COAGRO_STORES.filter(
+                  (s) => s.tipo === 'filial' && s.ativo !== false && s.identityEnabled !== false
+                ).map((st) => {
                   const selected = radioSpotDraft.targetStoreIds.includes(st.id);
                   return (
                     <button
@@ -457,7 +485,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
                   `🎙️ Roteiro ${req.protocolCode} enviado para o Curador gravar e publicar no Spotifast Server!`
                 );
               }}
-              className="w-full py-3 rounded-xl bg-[#004d40] hover:bg-[#00382e] text-[#ffab00] text-xs font-black uppercase tracking-wider shadow-xs cursor-pointer"
+              className="w-full py-3 rounded-xl bg-[#001C71] hover:bg-[#001242] text-[#ffab00] text-xs font-black shadow-xs cursor-pointer"
             >
               🎙️ Enviar Roteiro para Gravação no Marketing
             </button>
@@ -465,7 +493,7 @@ export const SpecialRequestsView: React.FC<SpecialRequestsViewProps> = ({ mode }
         </div>
 
         {/* Coluna Direita: Teleprompter & Cronômetro de Locução */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 flex flex-col justify-between space-y-4">
+        <div className="special-stage-card lg:col-span-7 rounded-3xl p-6 border border-slate-200 flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <span className="text-xs font-black uppercase text-slate-900">

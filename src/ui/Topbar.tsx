@@ -66,42 +66,30 @@ export const Topbar: React.FC<TopbarProps> = ({
       <div className="topbar-actions flex items-center gap-2">
         {/* Seletor RBAC de 3 Níveis (Seção 3.1 da Especificação) */}
         {!isLandingPage && (
-          <div className="hidden sm:inline-flex items-center gap-1 p-0.5 bg-slate-100 rounded-xl border border-slate-200">
+          <div className="role-switcher hidden sm:inline-flex" role="group" aria-label="Perfil de acesso">
             <button
               type="button"
               onClick={() => handleRoleChange('OPERATOR')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
-                userRole === 'OPERATOR'
-                  ? 'bg-white text-slate-900 shadow-2xs border border-slate-200'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-              title="Perfil Balcão: Emissão rápida de cartazes via verde"
+              className={`role-switch${userRole === 'OPERATOR' ? ' role-switch--active' : ''}`}
+              title="Perfil Balcão: emissão rápida de cartazes pela via verde"
             >
-              <span>🛒</span> Balcão
+              Balcão
             </button>
             <button
               type="button"
               onClick={() => handleRoleChange('STORE_MANAGER')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
-                userRole === 'STORE_MANAGER'
-                  ? 'bg-slate-900 text-white shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-              title="Perfil Gerente de Loja: Preenche formulários e solicita peças ao Marketing"
+              className={`role-switch${userRole === 'STORE_MANAGER' ? ' role-switch--active' : ''}`}
+              title="Perfil Gerente de loja: formulários e solicitações ao marketing"
             >
-              <span>🏬</span> Gerente ({activeStore.cidade})
+              Gerente
             </button>
             <button
               type="button"
               onClick={() => handleRoleChange('CURATOR_ADMIN')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
-                userRole === 'CURATOR_ADMIN'
-                  ? 'bg-[#004d40] text-[#ffab00] shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-              title="Perfil Curador Único (Kaio — Marketing): Visão global, edição e exportação alta resolução"
+              className={`role-switch${userRole === 'CURATOR_ADMIN' ? ' role-switch--active' : ''}`}
+              title="Perfil Curador: visão global, homologação e exportação"
             >
-              <span>🛡️</span> Curador (Kaio)
+              Curador
             </button>
           </div>
         )}
@@ -130,16 +118,24 @@ export const Topbar: React.FC<TopbarProps> = ({
           type="button"
           className="top-profile"
           onClick={() => onOpenSettings('acesso')}
-          title="Preferências de acesso e filial"
+          title={`Perfil Ativo: ${
+            userRole === 'CURATOR_ADMIN'
+              ? 'Kaio Virgínio (Curador de Marketing)'
+              : userRole === 'STORE_MANAGER'
+                ? `Gerente de Filial (${activeStore.nome})`
+                : 'Operador de Balcão'
+          } • ${activeStore.gerenteEmail} (Clique para Preferências de Acesso)`}
         >
           <span
             className="profile-avatar"
             style={{ width: 24, height: 24, flexBasis: 24 }}
           >
-            {userRole === 'CURATOR_ADMIN' ? 'KV' : 'GE'}
+            {userRole === 'CURATOR_ADMIN' ? 'KV' : userRole === 'STORE_MANAGER' ? 'GE' : 'OP'}
           </span>
-          <span className="hidden sm:inline">
-            {userRole === 'CURATOR_ADMIN' ? 'Curador' : activeStore.cidade}
+          <span className="hidden sm:inline font-bold">
+            {userRole === 'CURATOR_ADMIN'
+              ? 'Kaio (Curador)'
+              : `${userRole === 'STORE_MANAGER' ? 'Gerente' : 'Balcão'} · ${activeStore.cidade}`}
           </span>
         </button>
       </div>

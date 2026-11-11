@@ -460,6 +460,18 @@ export async function analyzeProductImageLocal(
 }
 
 /**
+ * O CSS do Tailwind 4 contém at-rules como `syntax: "<color>"`. O caractere `<`
+ * não pode entrar cru no `<style>` de um SVG XML, ou o parser invalida todo o
+ * documento e o `Image` falha antes do Canvas. Escapar preserva o CSS final.
+ */
+function escapeCssForSvgStyle(cssText: string): string {
+    return cssText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+/**
  * Exporta qualquer elemento DOM para PNG em alta resolução.
  * Suporta compartilhamento direto no WhatsApp (Mobile Web Share API) com fallback para download + link WhatsApp.
  * Injeta definições de fontes Google Fonts ativas para evitar fallback para Arial em sandbox de SVG/Image.
@@ -499,7 +511,7 @@ export async function exportElementToPng(
     const svgString = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${targetWidth}" height="${targetHeight}" viewBox="0 0 ${rect.width} ${rect.height}">
       <style>
-        ${cssText}
+        ${escapeCssForSvgStyle(cssText)}
       </style>
       <foreignObject width="100%" height="100%">
         ${serializedHtml}
@@ -507,8 +519,10 @@ export async function exportElementToPng(
     </svg>
   `;
 
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
+    // SVG com <foreignObject> carregado por blob: é tratado como conteúdo
+    // cross-origin pelo Chromium e taints o canvas. Data URI mantém o canvas
+    // exportável, permitindo o toBlob/download do PNG.
+    const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
 
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -519,13 +533,11 @@ export async function exportElementToPng(
             canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
             if (!ctx) {
-                URL.revokeObjectURL(url);
                 reject(new Error('Contexto 2D indisponível'));
                 return;
             }
 
             ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-            URL.revokeObjectURL(url);
 
             canvas.toBlob(async (blob) => {
                 if (!blob) {
@@ -583,9 +595,8 @@ export async function exportElementToPng(
             }, 'image/png');
         };
         img.onerror = (err) => {
-            URL.revokeObjectURL(url);
             reject(err);
         };
-        img.src = url;
+        img.src = svgDataUrl;
     });
 }

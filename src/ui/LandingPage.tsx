@@ -63,11 +63,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+    <div className="landing-page min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
       {/* ---------------------------------------------------------------- Navbar */}
       <header className="sticky top-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <GabaritoLogoSvg variant="on-dark" className="h-9 w-auto" />
+          <GabaritoLogoSvg variant="on-light" className="h-9 w-auto" />
         </div>
 
         <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-400">
@@ -84,7 +84,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
             className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black uppercase tracking-wider transition-all transform hover:scale-[1.02] shadow-sm flex items-center gap-1.5 cursor-pointer"
           >
             <span>⚡</span>
-            <span>Entrar no Estúdio</span>
+            <span>Entrar no estúdio</span>
           </button>
         </div>
       </header>
@@ -157,7 +157,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
                     className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2 cursor-pointer shrink-0"
                   >
                     <span>⚡</span>
-                    <span>ENCAIXAR NO GABARITO AGORA</span>
+                    <span>Encaixar no gabarito agora</span>
                   </button>
                 </div>
               </form>
@@ -169,7 +169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
       {/* ---------------------------------------------------------------- Destaques em 3 Passos */}
       <section id="como-funciona" className="py-16 px-4 sm:px-8 max-w-5xl mx-auto w-full">
         <div className="text-center space-y-2 mb-12">
-          <p className="text-xs font-black uppercase tracking-widest text-amber-400">FLUXO DE BALCÃO</p>
+          <p className="text-xs font-black uppercase tracking-widest text-amber-400">Fluxo de balcão</p>
           <h2 className="text-2xl sm:text-3xl font-black text-white">Como Funciona em 3 Passos Rápidos</h2>
           <p className="text-xs sm:text-sm text-slate-400">Elimine 14 cliques desnecessários e imprima com a fila do caixa andando.</p>
         </div>
@@ -205,7 +205,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
       <section id="calculadora-roi" className="py-16 px-4 sm:px-8 bg-slate-900/60 border-y border-slate-800">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest text-amber-400">CALCULADORA DE RETORNO</p>
+            <p className="text-xs font-black uppercase tracking-widest text-amber-400">Calculadora de retorno</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Quanto Dinheiro Sua Loja Paga por Cartaz Feito na Mão?</h2>
             <p className="text-xs sm:text-sm text-slate-400">Ajuste os parâmetros abaixo para calcular o tempo e o custo recuperados no mês.</p>
           </div>
@@ -265,7 +265,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
             {/* Resultado em Destaque */}
             <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-400/30 text-center space-y-4">
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
-                ECONOMIA ESTIMADA NA SUA LOJA
+                Economia estimada na sua loja
               </span>
 
               <div className="space-y-1">
@@ -296,7 +296,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
       {/* ---------------------------------------------------------------- Comparativo Anti-Canva */}
       <section id="anti-canva" className="py-16 px-4 sm:px-8 max-w-5xl mx-auto w-full">
         <div className="text-center space-y-2 mb-12">
-          <p className="text-xs font-black uppercase tracking-widest text-amber-400">COMPARATIVO REAL</p>
+          <p className="text-xs font-black uppercase tracking-widest text-amber-400">Comparativo real</p>
           <h2 className="text-2xl sm:text-3xl font-black text-white">Canva e Improviso vs. Gabarito Pro</h2>
           <p className="text-xs sm:text-sm text-slate-400">Por que ferramentas genéricas de design quebram no chão de loja.</p>
         </div>
@@ -345,7 +345,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToStudio, onOpenPa
       <section id="planos" className="py-16 px-4 sm:px-8 bg-slate-900/40 border-t border-slate-800">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest text-amber-400">PLANOS TRANSPARENTES</p>
+            <p className="text-xs font-black uppercase tracking-widest text-amber-400">Planos transparentes</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">Comece Grátis e Assine Quando Quiser</h2>
             <p className="text-xs sm:text-sm text-slate-400">Sem contratos de fidelidade. Cancele com 1 clique a qualquer momento.</p>
           </div>

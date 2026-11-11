@@ -53,6 +53,7 @@ import {
   HrNoticeArchetype,
   PosterLayoutArchetype,
   MarketingRequestItem,
+  COAGRO_OFFICIAL_POSTER_ARCHETYPE,
 } from './core/types';
 
 const MODULE_META: Record<
@@ -60,60 +61,67 @@ const MODULE_META: Record<
   { label: string; eyebrow: string; title: string; description: string; caption: string }
 > = {
   SOCIAL_MEDIA: {
-    label: '3. Anúncios da Loja (WhatsApp / Feed)',
-    eyebrow: 'COMUNICAÇÃO DIGITAL • VIA AMARELA',
-    title: 'Anúncios Personalizados da Loja',
-    description: 'Stories (9:16), Feed (4:5) e Quadrado (1:1) com identidade travada Coagro.',
-    caption: 'Prévia da arte social',
+    label: 'Anúncios da loja',
+    eyebrow: 'Comunicação digital',
+    title: 'Anúncios para WhatsApp e redes',
+    description: 'Stories e feed com identidade Coagro, preço conferido e aprovação de marketing.',
+    caption: 'Anúncio da loja',
   },
   STORE_POSTER: {
-    label: '1. Cartazes de PDV (Individual & Lote)',
-    eyebrow: 'PONTO DE VENDA • VIA VERDE',
-    title: 'Cartazes de Loja Coagro',
-    description: 'Impressão A4, Meia-Folha A5 e Etiquetas de Gôndola 2×2.',
-    caption: 'Prévia da folha de impressão',
+    label: 'Cartazes de PDV',
+    eyebrow: 'Ponto de venda',
+    title: 'Cartazes e etiquetas de gôndola',
+    description: 'Impressão em A4, meia-folha A5 e etiquetas 2×2 com preço e vigência conferidos.',
+    caption: 'Folha de impressão',
   },
   CAROUSEL: {
-    label: 'Carrossel de Ofertas',
-    eyebrow: 'SEQUÊNCIA DE OFERTAS • VIA AMARELA',
-    title: 'Carrossel Guiado Coagro',
-    description: 'Sequência de slides 4:5 com capa, produtos e chamada final.',
-    caption: 'Prévia do slide ativo',
+    label: 'Carrossel',
+    eyebrow: 'Sequência de ofertas',
+    title: 'Carrossel de ofertas',
+    description: 'Capa, ofertas e chamada final em uma sequência pronta para publicar.',
+    caption: 'Slide ativo',
   },
   HR_NOTICE: {
-    label: 'Comunicados & Mural A4',
-    eyebrow: 'COMUNICAÇÃO INTERNA • VIA VERDE',
-    title: 'RH, Vagas & Comunicados de Filial',
-    description: 'Vagas, avisos operacionais e normas de segurança NR-06/NR-31.',
-    caption: 'Prévia do comunicado',
+    label: 'Comunicados',
+    eyebrow: 'Comunicação interna',
+    title: 'Comunicados e mural',
+    description: 'Vagas, avisos e segurança em material de mural ou card interno.',
+    caption: 'Comunicado',
   },
   BANNER_FAIXA: {
-    label: '2. Faixas, Banners & Lonas',
-    eyebrow: 'GRANDE FORMATO • COTAÇÃO GRÁFICA',
-    title: 'Faixas de Rua, Banners e Lonas de Fachada',
-    description: 'Mockup proporcional travado e encaminhamento para cotação gráfica.',
-    caption: 'Mockup proporcional da lona/faixa',
+    label: 'Faixas e lonas',
+    eyebrow: 'Grande formato',
+    title: 'Faixas, banners e lonas',
+    description: 'Medidas, mockup proporcional e envio para cotação gráfica.',
+    caption: 'Mockup do material',
+  },
+  CAMPAIGNS: {
+    label: 'Campanhas',
+    eyebrow: 'Campanhas da rede',
+    title: 'Campanhas e mídia oficial',
+    description: 'Pacotes sazonais, criativos, vídeos e spots homologados para as unidades.',
+    caption: 'Campanhas oficiais',
   },
   RADIO_SPOT: {
-    label: '5. Anúncios Rádio Coagro (:8790)',
-    eyebrow: 'MÍDIA INDOOR • SPOTIFAST SERVER',
-    title: 'Solicitação de Spots para Rádio Interna',
-    description: 'Roteiros de 15s e 30s integrados à grade musical das lojas (2 músicas : 1 comercial).',
-    caption: 'Teleprompter da Rádio Coagro',
+    label: 'Rádio Coagro',
+    eyebrow: 'Mídia interna',
+    title: 'Rádio Coagro',
+    description: 'Roteiros de 15 e 30 segundos para o som ambiente das lojas.',
+    caption: 'Roteiro de locução',
   },
   BRAND_HUB: {
-    label: '4. Kit Colaborador & Brand Hub',
-    eyebrow: 'PADRONIZAÇÃO INSTITUCIONAL',
-    title: 'Brand Hub, Kit Colaborador & 15 Unidades',
-    description: 'Assinaturas de e-mail, cartões de visita, papel timbrado A4, vetores SVG e CNPJs.',
-    caption: 'Ativos oficiais do Grupo Coagro',
+    label: 'Kit Colaborador',
+    eyebrow: 'Identidade e materiais',
+    title: 'Kit Colaborador e Marca',
+    description: 'Perfil, assinatura, cartão, papelaria e ativos oficiais do Grupo Coagro.',
+    caption: 'Materiais de identidade',
   },
   CURATOR_QUEUE: {
-    label: 'Fila do Curador (Kaio)',
-    eyebrow: 'GOVERNANÇA CENTRALIZADA • MARKETING',
-    title: 'Painel de Curadoria & Dicionário Corporativo Agro',
-    description: 'Homologação em 1 clique, revisão ortográfica Camada 2 e liberação de arquivos.',
-    caption: 'Fila global de solicitações',
+    label: 'Fila do Curador',
+    eyebrow: 'Curadoria central',
+    title: 'Fila de homologação',
+    description: 'Validação de peças, ortografia e materiais gráficos das unidades.',
+    caption: 'Fila de homologação',
   },
 };
 
@@ -209,6 +217,9 @@ export default function App() {
   const activeDept =
     brandKit.departments.find((d) => d.id === brandKit.activeDepartmentId) ||
     brandKit.departments[0];
+  const activeCampaign = brandKit.activeCampaignId
+    ? brandKit.seasonalCampaigns.find((campaign) => campaign.id === brandKit.activeCampaignId)
+    : undefined;
 
   const profileInitials =
     (brandKit.companyName || SAAS_BRAND.name)
@@ -239,7 +250,7 @@ export default function App() {
               ? 'feed'
               : 'square';
   const previewStack =
-    activeModule === 'STORE_POSTER' && posterConfig.batchMode;
+    activeModule === 'STORE_POSTER' && posterConfig.batchMode && state.userRole !== 'OPERATOR';
   const previewLabel =
     activeModule === 'STORE_POSTER'
       ? posterConfig.printGrid === 'A4_FULL'
@@ -542,20 +553,27 @@ export default function App() {
           />
         ) : activeModule === 'CURATOR_QUEUE' ? (
           <CuratorQueueView />
-        ) : activeModule === 'BRAND_HUB' ? (
-          <BrandHubView />
+        ) : activeModule === 'BRAND_HUB' || activeModule === 'CAMPAIGNS' ? (
+          <BrandHubView
+            key={activeModule}
+            initialTab={activeModule === 'CAMPAIGNS' ? 'campaigns' : 'team'}
+            campaignsMode={activeModule === 'CAMPAIGNS'}
+          />
         ) : activeModule === 'BANNER_FAIXA' || activeModule === 'RADIO_SPOT' ? (
           <SpecialRequestsView mode={activeModule} />
         ) : (
           <div className="page-wrap">
             <section className="studio-section">
               <div className="studio-section-heading">
-                <div>
+                <div className="workboard-heading">
                   <div className="eyebrow eyebrow--compact">
                     <span className="eyebrow-line" />
                     {MODULE_META[activeModule].eyebrow}
                   </div>
-                  <h2>{MODULE_META[activeModule].label}</h2>
+                  <h1>{MODULE_META[activeModule].label}</h1>
+                  <p className="workboard-description">
+                    {MODULE_META[activeModule].description}
+                  </p>
                 </div>
               </div>
 
@@ -581,6 +599,29 @@ export default function App() {
                       ✕
                     </button>
                   </div>
+                </div>
+              )}
+
+              {activeCampaign && (activeModule === 'STORE_POSTER' || activeModule === 'SOCIAL_MEDIA') && (
+                <div
+                  className="mb-4 flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-xs font-bold"
+                  style={{
+                    borderColor: `${activeCampaign.accentColorHex}66`,
+                    backgroundColor: `${activeCampaign.primaryColorHex}12`,
+                    color: activeCampaign.primaryColorHex,
+                  }}
+                  data-campaign-active={activeCampaign.id}
+                >
+                  <span>
+                    Campanha Ativa: <strong>{activeCampaign.name}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => studioActions.setActiveCampaign(null)}
+                    className="shrink-0 rounded-lg border border-current px-2 py-1 text-[10px] font-black uppercase"
+                  >
+                    × Desativar
+                  </button>
                 </div>
               )}
 
@@ -622,7 +663,8 @@ export default function App() {
                     </div>
                   )}
 
-          {/* BARRA SMART PASTE DO WHATSAPP (PORTA DE ENTRADA DOS 10 SEGUNDOS - #22) */}
+          {/* BARRA SMART PASTE DO WHATSAPP — apenas módulos comerciais */}
+          {['STORE_POSTER', 'SOCIAL_MEDIA', 'CAROUSEL'].includes(activeModule) && (
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <label
@@ -685,6 +727,7 @@ export default function App() {
               </div>
             )}
           </div>
+          )}
 
           {state.userRole !== 'OPERATOR' && activeModule === 'STORE_POSTER' && (
             <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/80 grid grid-cols-2 gap-1 mb-1">
@@ -719,7 +762,7 @@ export default function App() {
           )}
 
           {/* MODO LOTE DEDICADO: O FORMULÁRIO MANUAL SOME COMPLETAMENTE */}
-          {activeModule === 'STORE_POSTER' && posterConfig.batchMode ? (
+          {activeModule === 'STORE_POSTER' && posterConfig.batchMode && state.userRole !== 'OPERATOR' ? (
             <div
               data-batch-total={state.parsedBatchRows.length}
               data-batch-valid={state.parsedBatchRows.filter((r) => r.status === 'VALID').length}
@@ -982,8 +1025,64 @@ export default function App() {
                     📢 RH, Vagas & Comunicados Internos
                   </h2>
                   <p className="text-xs text-slate-500">
-                    100% White-Label • Prontos para mural A4 ou postagem no Feed/WhatsApp
+                    Padrão Oficial de Comunicação Interna — Nossas Unidades
                   </p>
+                </div>
+              </div>
+
+              {/* Seletor de Finalidade / Canal (Sprint D) */}
+              <div>
+                <span className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Finalidade / Canal:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                  {[
+                    {
+                      id: 'MURAL_A4' as const,
+                      label: '🏢 Mural Físico de Loja',
+                      sub: 'Formato A4 (opção P&B ou Colorido)',
+                      format: 'A4_PRINT' as const,
+                    },
+                    {
+                      id: 'SOCIAL_INTERNAL' as const,
+                      label: '📱 Card Rede Social / Zap',
+                      sub: 'Formato Feed 4:5 (Colorido Oficial)',
+                      format: 'SOCIAL_FEED' as const,
+                    },
+                    {
+                      id: 'BOARD_FORMAL' as const,
+                      label: '🏛️ Comunicado da Diretoria',
+                      sub: 'Formato A4 Formal (Colorido Oficial)',
+                      format: 'A4_PRINT' as const,
+                    },
+                  ].map((ch) => {
+                    const isSelected = (hrNotice.channel || 'MURAL_A4') === ch.id;
+                    return (
+                      <button
+                        key={ch.id}
+                        type="button"
+                        onClick={() => {
+                          studioActions.updateHrNotice({
+                            channel: ch.id,
+                            outputFormat: ch.format,
+                          });
+                          if (ch.id !== 'MURAL_A4') {
+                            studioActions.setPosterVisualTheme('BRAND_PRIMARY');
+                          }
+                        }}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                            : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{ch.label}</div>
+                        <div className={`text-[10px] ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
+                          {ch.sub}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1059,6 +1158,7 @@ export default function App() {
                       type="text"
                       placeholder="Ex: RH-01"
                       value={hrNotice.referenceCode}
+                      maxLength={14}
                       onChange={(e) =>
                         studioActions.updateHrNotice({ referenceCode: e.target.value })
                       }
@@ -1080,9 +1180,10 @@ export default function App() {
                           : hrNotice.archetype === 'SAFETY_COMPLIANCE'
                             ? 'Ex: USO OBRIGATÓRIO DE EPI'
                             : 'Ex: COMUNICADO OFICIAL'
-                    }
-                    value={hrNotice.headline}
-                    onChange={(e) =>
+                     }
+                     value={hrNotice.headline}
+                     maxLength={64}
+                     onChange={(e) =>
                       studioActions.updateHrNotice({ headline: e.target.value })
                     }
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-extrabold uppercase text-slate-900"
@@ -1104,9 +1205,10 @@ export default function App() {
                       : hrNotice.archetype === 'HOLIDAY_CLOSURE'
                         ? 'Ex: Recesso de Carnaval'
                         : 'Ex: Manutenção Preventiva'
-                  }
-                  value={hrNotice.roleOrSubject}
-                  onChange={(e) =>
+                   }
+                   value={hrNotice.roleOrSubject}
+                   maxLength={58}
+                   onChange={(e) =>
                     studioActions.updateHrNotice({ roleOrSubject: e.target.value })
                   }
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-extrabold text-slate-900"
@@ -1134,9 +1236,10 @@ export default function App() {
                         : hrNotice.archetype === 'HOLIDAY_CLOSURE'
                           ? 'Ex: Retorno na segunda-feira às 07:30'
                           : 'Ex: Segunda a Sexta das 08h às 18h'
-                    }
-                    value={hrNotice.scheduleOrLocation}
-                    onChange={(e) =>
+                     }
+                     value={hrNotice.scheduleOrLocation}
+                     maxLength={72}
+                     onChange={(e) =>
                       studioActions.updateHrNotice({
                         scheduleOrLocation: e.target.value,
                       })
@@ -1159,6 +1262,7 @@ export default function App() {
                           : 'Ex: Plantão telefônico no ramal 101'
                       }
                       value={hrNotice.compensationOrHighlight}
+                      maxLength={72}
                       onChange={(e) =>
                         studioActions.updateHrNotice({
                           compensationOrHighlight: e.target.value,
@@ -1179,6 +1283,7 @@ export default function App() {
                   </label>
                   <textarea
                     rows={3}
+                    maxLength={300}
                     placeholder={
                       hrNotice.archetype === 'JOB_VACANCY'
                         ? 'Ex: Ensino Médio Completo\nExperiência com vendas de balcão\nBoa comunicação e pontualidade'
@@ -1217,6 +1322,7 @@ export default function App() {
                           : 'Ex: WhatsApp comercial: (00) 00000-0000'
                       }
                       value={hrNotice.contactChannel}
+                      maxLength={96}
                       onChange={(e) =>
                         studioActions.updateHrNotice({ contactChannel: e.target.value })
                       }
@@ -1247,16 +1353,15 @@ export default function App() {
             /* FORMULÁRIO INDIVIDUAL COM FLUXO ERGONÔMICO DE 10 SEGUNDOS */
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
               <div className="editor-header">
-                <div className="step-number">01</div>
                 <div className="editor-header-copy">
                   <span>
-                    CONFIGURE SUA CAMPANHA · ID #{metrics.forensicId}
-                    <HelpHint text="Código único gerado matematicamente a partir do produto, preço e validade para auditoria contra divergência de gôndola." />
+                    Dados da oferta · ID {metrics.forensicId}
+                    <HelpHint text="Código único gerado a partir do produto, preço e validade para auditoria contra divergência de gôndola." />
                   </span>
                   <h2>
                     {activeModule === 'STORE_POSTER'
-                      ? 'Informações do Cartaz'
-                      : 'Criação Manual de Arte'}
+                      ? 'Informações do cartaz'
+                      : 'Criar anúncio'}
                   </h2>
                 </div>
 
@@ -2128,7 +2233,6 @@ export default function App() {
                   [
                     { id: 'STORY_9_16', label: 'Story' },
                     { id: 'FEED_4_5', label: 'Feed' },
-                    { id: 'SQUARE_1_1', label: '1:1' },
                   ] as { id: SocialAspectRatio; label: string }[]
                 ).map((ar) => (
                   <button
@@ -2154,29 +2258,28 @@ export default function App() {
 
             <div className="segmented" role="group" aria-label="Tema visual">
               {activeModule === 'HR_NOTICE' ? (
-                <>
-                  <button
-                    type="button"
-                    aria-pressed={posterConfig.visualTheme === 'BW_ECO_TONER'}
-                    onClick={() => studioActions.setPosterVisualTheme('BW_ECO_TONER')}
-                  >
-                    P&B
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={posterConfig.visualTheme === 'BRAND_SECONDARY'}
-                    onClick={() => studioActions.setPosterVisualTheme('BRAND_SECONDARY')}
-                  >
-                    Azul
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={posterConfig.visualTheme === 'BRAND_PRIMARY'}
-                    onClick={() => studioActions.setPosterVisualTheme('BRAND_PRIMARY')}
-                  >
-                    Verde
-                  </button>
-                </>
+                (hrNotice.channel || 'MURAL_A4') === 'MURAL_A4' && hrNotice.outputFormat === 'A4_PRINT' ? (
+                  <>
+                    <button
+                      type="button"
+                      aria-pressed={posterConfig.visualTheme === 'BW_ECO_TONER'}
+                      onClick={() => studioActions.setPosterVisualTheme('BW_ECO_TONER')}
+                    >
+                      P&B (Toner)
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={posterConfig.visualTheme !== 'BW_ECO_TONER'}
+                      onClick={() => studioActions.setPosterVisualTheme('BRAND_PRIMARY')}
+                    >
+                      Colorido
+                    </button>
+                  </>
+                ) : (
+                  <span className="px-2.5 py-1 text-[11px] font-bold text-slate-600 bg-slate-100 rounded-lg">
+                    🎨 Paleta Oficial Colorida
+                  </span>
+                )
               ) : activeModule === 'SOCIAL_MEDIA' || activeModule === 'CAROUSEL' ? (
                 <>
                   <button
@@ -2217,65 +2320,13 @@ export default function App() {
             </div>
 
             {activeModule === 'STORE_POSTER' && (
-              <select
-                aria-label="Modelo estrutural do cartaz"
-                title="Escolher modelo estrutural do cartaz"
-                value={posterConfig.layoutArchetype}
-                onChange={(e) =>
-                  studioActions.setPosterLayoutArchetype(
-                    e.target.value as PosterLayoutArchetype
-                  )
-                }
-                className="preview-badge bg-white text-slate-900 border border-slate-300 font-bold text-xs px-2.5 py-1 rounded-lg cursor-pointer"
+              <span
+                className="preview-badge preview-badge--accent"
+                data-poster-template-active={COAGRO_OFFICIAL_POSTER_ARCHETYPE}
               >
-                <option value="PROMO_MODERN_V">Modelo: Varejo Pop</option>
-                <option value="PROMO_CLASSIC_V">Modelo: Promo V Clássico</option>
-                <option value="CLEAN_DIRECT_PRICE">Modelo: Preço Direto</option>
-                <option value="MACHINERY_INSTALLMENT">Modelo: Parcelado CDC</option>
-                <option value="COMBO_ADVANTAGE">Modelo: Combo (#10B981)</option>
-                <option value="CONDITION_ADVANTAGE">Modelo: Brinde / Condição</option>
-                <option value="GRID_MULTIPRODUCT_4X">Modelo: Encarte Grid 6x</option>
-              </select>
+                Modelo Oficial: Promo V Clássico
+              </span>
             )}
-
-            {activeModule === 'STORE_POSTER' &&
-              isControlVisible(prefs, 'STORE_POSTER', 'posterBadge') && (
-                <button
-                  type="button"
-                  className={`preview-badge${
-                    posterConfig.showDiscountPercentageBadge
-                      ? ' preview-badge--accent'
-                      : ''
-                  }`}
-                  aria-pressed={posterConfig.showDiscountPercentageBadge}
-                  onClick={() =>
-                    studioActions.togglePosterDiscountBadge(
-                      !posterConfig.showDiscountPercentageBadge
-                    )
-                  }
-                >
-                  Selo % OFF
-                </button>
-              )}
-
-            {activeModule === 'STORE_POSTER' &&
-              isControlVisible(prefs, 'STORE_POSTER', 'posterPricePerMeasure') && (
-                <button
-                  type="button"
-                  className={`preview-badge${
-                    posterConfig.showPricePerKgOrLiter ? ' preview-badge--accent' : ''
-                  }`}
-                  aria-pressed={posterConfig.showPricePerKgOrLiter}
-                  title="Exibir preço equivalente por quilo ou litro"
-                  onClick={() =>
-                    studioActions.togglePosterPricePerMeasure(
-                      !posterConfig.showPricePerKgOrLiter
-                    )
-                  }
-                >
-                  R$ / kg
-                </button>
-              )}
           </div>
 
           <div className="preview-card">
@@ -2284,9 +2335,9 @@ export default function App() {
                 <span className="preview-title-mark">
                   <IconEye size={12} />
                 </span>
-                <strong>PRÉ-VISUALIZAÇÃO</strong>
+                <strong>Prévia</strong>
                 <span className="preview-live">
-                  <i aria-hidden="true" /> AO VIVO
+                  <i aria-hidden="true" /> atualiza ao vivo
                 </span>
               </div>
               <div className="preview-meta">
@@ -2303,13 +2354,13 @@ export default function App() {
               <StorePosterA4Sheet
                 sheetRef={posterSheetRef}
                 offer={currentOffer}
-                batchMode={posterConfig.batchMode}
+                batchMode={posterConfig.batchMode && state.userRole !== 'OPERATOR'}
                 batchRows={state.parsedBatchRows}
                 batchOffers={state.batchOffers}
                 brandKit={brandKit}
                 printGrid={posterConfig.printGrid}
                 theme={posterConfig.visualTheme}
-                layoutArchetype={posterConfig.layoutArchetype}
+                layoutArchetype={COAGRO_OFFICIAL_POSTER_ARCHETYPE}
                 showDiscountBadge={posterConfig.showDiscountPercentageBadge}
                 showPricePerMeasure={posterConfig.showPricePerKgOrLiter}
               />

@@ -22,10 +22,19 @@ export const SAAS_BRAND = {
 export const COAGRO_HUB_BRAND = {
   name: 'Hub Coagro',
   shortName: 'Coagro Hub',
+  version: '3.4.0',
   tagline: 'Central de Criação, Governança de Marca & Demandas de Marketing',
   curatorName: 'Kaio Virgínio (Marketing Coagro)',
   curatorEmail: 'marketing@grupocoagro.com.br',
+  primaryColorHex: '#002B49',   // Azul Oficial da Logotipo Coagro
+  secondaryColorHex: '#004d40', // Verde-Safra Institucional
+  accentColorHex: '#ffab00',    // Dourado / Amarelo Ouro
 } as const;
+
+// Par único oficial do Hub Coagro. Os presets white-label antigos permanecem
+// tipados para leitura de backups, mas o produto não permite mais substituí-lo.
+export const COAGRO_OFFICIAL_FONT_HEADING = "'Exo 2', sans-serif";
+export const COAGRO_OFFICIAL_FONT_BODY = "'Inter', sans-serif";
 
 export type CoagroUserRole = 'OPERATOR' | 'STORE_MANAGER' | 'CURATOR_ADMIN';
 
@@ -60,6 +69,7 @@ export type ModuleMode =
   | 'CAROUSEL'
   | 'HR_NOTICE'
   | 'BRAND_HUB'
+  | 'CAMPAIGNS'
   | 'CURATOR_QUEUE'
   | 'BANNER_FAIXA'
   | 'RADIO_SPOT';
@@ -117,6 +127,27 @@ export type PosterLayoutArchetype =
   | 'COMBO_ADVANTAGE'
   | 'GRID_MULTIPRODUCT_4X';
 
+export interface CoagroTemplateAvailability {
+  id: PosterLayoutArchetype;
+  label: string;
+  enabled: boolean;
+  hidden?: boolean;
+}
+
+export const COAGRO_OFFICIAL_POSTER_ARCHETYPE: PosterLayoutArchetype = 'PROMO_CLASSIC_V';
+
+// Curadoria oficial do Hub: os renderizadores antigos permanecem no código para
+// abrir peças salvas, mas somente o Promo V fica disponível para novas peças.
+export const COAGRO_POSTER_TEMPLATE_CATALOG: CoagroTemplateAvailability[] = [
+  { id: 'PROMO_CLASSIC_V', label: 'Promo V Clássico', enabled: true },
+  { id: 'PROMO_MODERN_V', label: 'Varejo Pop', enabled: false, hidden: true },
+  { id: 'CLEAN_DIRECT_PRICE', label: 'Preço Direto', enabled: false, hidden: true },
+  { id: 'MACHINERY_INSTALLMENT', label: 'Parcelado CDC', enabled: false, hidden: true },
+  { id: 'CONDITION_ADVANTAGE', label: 'Brinde / Condição', enabled: false, hidden: true },
+  { id: 'COMBO_ADVANTAGE', label: 'Combo', enabled: false, hidden: true },
+  { id: 'GRID_MULTIPRODUCT_4X', label: 'Encarte Grid', enabled: false, hidden: true },
+];
+
 export type VisualThemePreset = 
   | 'BW_ECO_TONER'
   | 'BRAND_PRIMARY'
@@ -164,6 +195,29 @@ export interface SubBrandDepartment {
   secondaryColorHex: string;
   accentColorHex: string;
   logoUrl?: string;
+  enabled?: boolean;
+}
+
+export interface SeasonalCampaignMediaStory {
+  id: string;
+  title: string;
+  previewUrl?: string;
+  downloadFilename?: string;
+}
+
+export interface SeasonalCampaignVideo {
+  id: string;
+  department: 'Nutrição Animal' | 'Defensivos' | 'Máquinas' | 'Pet';
+  title: string;
+  duration: string;
+  videoUrl?: string;
+}
+
+export interface SeasonalCampaignRadioSpot {
+  id: string;
+  title: string;
+  durationSeconds: number;
+  audioUrl?: string;
 }
 
 export interface SeasonalCampaign {
@@ -174,6 +228,10 @@ export interface SeasonalCampaign {
   accentColorHex: string;
   bannerHeaderUrl?: string;
   badgeLogoUrl?: string;
+  description?: string;
+  stories?: SeasonalCampaignMediaStory[];
+  departmentVideos?: SeasonalCampaignVideo[];
+  radioSpots?: SeasonalCampaignRadioSpot[];
 }
 
 export interface TenantBrandKit {
@@ -335,10 +393,16 @@ export type HrNoticeArchetype =
   | 'HOLIDAY_CLOSURE'
   | 'SAFETY_COMPLIANCE';
 
+export type HrNoticeChannel =
+  | 'MURAL_A4'
+  | 'SOCIAL_INTERNAL'
+  | 'BOARD_FORMAL';
+
 export interface HrNoticeState {
   id: string;
   referenceCode: string;
   archetype: HrNoticeArchetype;
+  channel?: HrNoticeChannel;
   headline: string;
   roleOrSubject: string;
   requirementsOrPoints: string[];
@@ -401,6 +465,7 @@ export interface RadioSpotDraft {
   scriptText: string;
   targetStoreIds: string[];
   priority: 1 | 2;
+  mentionStoreName?: boolean;
 }
 
 export interface MarketingRequestItem {
@@ -482,6 +547,3 @@ export interface StudioGlobalState {
   lastSubmittedRequest?: MarketingRequestItem | null;
   generationAuditHistory?: GenerationAuditRecord[];
 }
-
-
-

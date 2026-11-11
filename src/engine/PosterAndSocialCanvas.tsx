@@ -10,6 +10,7 @@ import {
     PosterLayoutArchetype,
     CarouselSlideItem,
     HrNoticeState,
+    COAGRO_OFFICIAL_POSTER_ARCHETYPE,
 } from '../core/types';
 import {
     getContrastRatio,
@@ -17,6 +18,13 @@ import {
     generateHrForensicId,
 } from '../core/businessRules';
 import { resolveRenderSpec } from '../core/resolve';
+import {
+    LogoHorizontalAzul,
+    LogoHorizontalBranca,
+    LogoHorizontalMonoBranca,
+    LogoHorizontalMonoPreta,
+    CoagroPetLogo,
+} from '../ui/coagroLogos';
 
 // ============================================================================
 // 1. RESOLUTOR DE PALETA DE CORES WHITE-LABEL (TEMA P&B, MARCA 1, MARCA 2)
@@ -134,6 +142,27 @@ export function resolveThemePalette(
     };
 }
 
+const OfficialBrandLogo: React.FC<{
+    brandKit: TenantBrandKit;
+    theme: VisualThemePreset;
+    palette: ResolvedPalette;
+    className?: string;
+}> = ({ brandKit, theme, palette, className = 'h-[7cqw] w-auto' }) => {
+    if (theme === 'BW_ECO_TONER') {
+        return <LogoHorizontalMonoBranca className={`${className} shrink-0`} />;
+    }
+
+    if (brandKit.activeDepartmentId === 'dept-2') {
+        return <CoagroPetLogo className={`${className} shrink-0`} />;
+    }
+
+    return palette.headerText === '#000000' ? (
+        <LogoHorizontalAzul className={`${className} shrink-0`} />
+    ) : (
+        <LogoHorizontalBranca className={`${className} shrink-0`} />
+    );
+};
+
 // ============================================================================
 // 2. UNIDADE INDIVIDUAL DE CARTAZ DE LOJA (4 ARQUÉTIPOS DE LAYOUT WHITE-LABEL)
 // ============================================================================
@@ -228,8 +257,9 @@ export const SingleStorePosterUnit: React.FC<SingleStorePosterUnitProps> = ({
                 </div>
             )}
 
-            {/* Rodapé Técnico Discreto com Elementos Core (SKU + Vigência PROCON + ID Forense + Identidade da Marca) */}
+            {/* Rodapé Técnico Discreto com Elementos Core (SKU + Vigência PROCON + WhatsApp Filial + Identidade Vetorial Coagro) */}
             <div
+                data-forensic-id={metrics.forensicId}
                 style={{ borderColor: isMinimal ? '#e2e8f0' : palette.headerBg }}
                 className={`${
                     isMinimal ? 'border-t' : 'border-t-[0.3cqw]'
@@ -244,7 +274,7 @@ export const SingleStorePosterUnit: React.FC<SingleStorePosterUnitProps> = ({
                             isCompact ? 'text-[1.8cqw]' : 'text-[2.25cqw]'
                         }`}
                     >
-                        {offer.ctaText || 'APROVEITE! ÚLTIMAS UNIDADES!'}
+                        {offer.ctaText?.replace(/\s*(ou peça pelo WhatsApp!?|no WhatsApp!?)/gi, '') || 'OFERTA EXCLUSIVA NA LOJA'}
                     </span>
                     <span
                         className={`font-mono tabular-nums font-semibold opacity-75 truncate ${
@@ -252,27 +282,44 @@ export const SingleStorePosterUnit: React.FC<SingleStorePosterUnitProps> = ({
                         }`}
                     >
                         {offer.skuCode ? `CÓD: ${offer.skuCode} • ` : ''}
-                        {metrics.validityFormatted} • #{metrics.forensicId}
+                        {metrics.validityFormatted}
                     </span>
                 </div>
 
-                {/* Identidade White-Label da Marca no Canto Inferior Direito */}
-                <div className="shrink-0 flex flex-col items-end">
+                {/* Canal de Atendimento com Ícone do WhatsApp + Telefone Formatado da Filial Ativa */}
+                {brandKit.defaultPhoneWhatsapp && (
+                    <div className="flex items-center gap-[0.7cqw] text-left opacity-90 shrink-0">
+                        <svg
+                            className={`${isCompact ? 'w-[2.2cqw] h-[2.2cqw]' : 'w-[2.8cqw] h-[2.8cqw]'} shrink-0 text-[#25D366] fill-current`}
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.073-2.158-.535-1.516-.628-2.502-2.138-2.579-2.241-.077-.102-.62-.824-.62-1.572 0-.749.393-1.118.533-1.27.14-.153.306-.192.408-.192.102 0 .204.001.294.006.094.004.22-.036.345.263.129.311.442 1.076.48 1.153.039.077.065.167.013.27-.052.102-.078.167-.154.256-.076.09-.16.2-.229.27-.077.078-.157.162-.068.315.089.153.396.654.85 1.059.584.521 1.077.682 1.23.759.154.077.244.065.334-.038.09-.103.385-.448.487-.601.103-.154.205-.128.346-.077.141.051.895.422 1.049.499.154.077.256.115.294.18.038.064.038.371-.106.776zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.306A9.96 9.96 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
+                        </svg>
+                        <div className="flex flex-col leading-tight">
+                            <span className={`font-black tracking-tight ${isCompact ? 'text-[1.2cqw]' : 'text-[1.5cqw]'}`}>
+                                {brandKit.defaultBranchName || 'Loja Coagro'}
+                            </span>
+                            <span className={`font-mono font-bold ${isCompact ? 'text-[1.2cqw]' : 'text-[1.5cqw]'}`}>
+                                {brandKit.defaultPhoneWhatsapp}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Identidade Oficial Vetorizada da Coagro no Canto Inferior Direito */}
+                <div className="shrink-0 flex flex-col items-end justify-center">
                     {brandKit.defaultLogoUrl ? (
                         <img
                             src={brandKit.defaultLogoUrl}
                             alt={brandKit.companyName}
                             className={`${isCompact ? 'h-[4.2cqw]' : 'h-[5.8cqw]'} object-contain`}
                         />
+                    ) : theme === 'BW_ECO_TONER' ? (
+                        <LogoHorizontalMonoPreta className={`${isCompact ? 'h-[3.6cqw]' : 'h-[4.8cqw]'} w-auto`} />
+                    ) : brandKit.activeDepartmentId === 'dept-2' ? (
+                        <CoagroPetLogo className={`${isCompact ? 'h-[3.6cqw]' : 'h-[4.8cqw]'} w-auto`} />
                     ) : (
-                        <div
-                            style={{ fontFamily: brandKit.fontHeading, color: palette.priceText }}
-                            className={`font-black tracking-tighter leading-none ${
-                                isCompact ? 'text-[2.5cqw]' : 'text-[3.4cqw]'
-                            }`}
-                        >
-                            {brandKit.companyName}
-                        </div>
+                        <LogoHorizontalAzul className={`${isCompact ? 'h-[3.6cqw]' : 'h-[4.8cqw]'} w-auto`} />
                     )}
                 </div>
             </div>
@@ -690,7 +737,7 @@ export const StorePosterA4Sheet: React.FC<StorePosterA4SheetProps> = ({
     brandKit,
     printGrid,
     theme,
-    layoutArchetype = 'PROMO_CLASSIC_V',
+    layoutArchetype = COAGRO_OFFICIAL_POSTER_ARCHETYPE,
     showDiscountBadge,
     showPricePerMeasure,
     sheetRef,
@@ -748,7 +795,7 @@ export const StorePosterA4Sheet: React.FC<StorePosterA4SheetProps> = ({
                   if (spec.canExport) {
                       acc.push({
                           item,
-                          recommendedArchetype: spec.metrics.recommendedArchetype,
+                          recommendedArchetype: layoutArchetype,
                       });
                   }
                   return acc;
@@ -988,17 +1035,13 @@ export const SocialMediaCardCanvas: React.FC<SocialMediaCardCanvasProps> = ({
                 }`}
             >
                 <div className="flex items-center gap-[2.2cqw] min-w-0">
-                    {brandKit.defaultLogoUrl && (
-                        <img
-                            src={brandKit.defaultLogoUrl}
-                            alt={brandKit.companyName}
-                            className="h-[7.5cqw] max-w-[24cqw] object-contain bg-white/95 px-[1.5cqw] py-[0.6cqw] rounded-[1.5cqw] shadow-sm shrink-0"
-                        />
-                    )}
+                    <OfficialBrandLogo
+                        brandKit={brandKit}
+                        theme={theme}
+                        palette={palette}
+                        className="h-[7.5cqw] max-w-[24cqw]"
+                    />
                     <div className="flex flex-col min-w-0">
-                        <span className="font-black text-[4.6cqw] tracking-tight leading-none truncate">
-                            {brandKit.companyName}
-                        </span>
                         {brandKit.defaultBranchName && (
                             <span className="text-[2.2cqw] font-semibold opacity-80 mt-[0.5cqw] truncate">
                                 {brandKit.defaultBranchName}
@@ -1052,50 +1095,23 @@ export const SocialMediaCardCanvas: React.FC<SocialMediaCardCanvasProps> = ({
                         />
                     </div>
                 ) : (
-                    /* Fallback Gráfico Monumental 100% White-Label quando não há foto do produto */
-                    <div className="relative flex flex-col items-center justify-center mb-[2.5cqw]">
-                        <div
-                            style={{
-                                backgroundColor: palette.accentBg,
-                                color: palette.accentText,
-                                borderColor: 'rgba(255,255,255,0.4)',
-                            }}
-                            className={`${
-                                isStory ? 'w-[42cqw] h-[42cqw]' : 'w-[32cqw] h-[32cqw]'
-                            } rounded-full border-4 shadow-2xl flex flex-col items-center justify-center p-[3cqw] relative overflow-hidden backdrop-blur-xs select-none ${
-                                stylePreset === 'RETAIL_POP'
-                                    ? '-rotate-2'
-                                    : stylePreset === 'AGRO_BRUTALIST'
-                                      ? 'rounded-2xl border-dashed'
-                                      : ''
-                            }`}
+                    /* Fallback tipográfico institucional: não simula foto nem erro de upload. */
+                    <div className="relative mb-[2.5cqw] flex w-full flex-col items-center justify-center border-y-[0.5cqw] border-white/35 py-[5cqw]">
+                        <span
+                            style={{ fontFamily: brandKit.fontBody }}
+                            className="text-[2.4cqw] font-extrabold uppercase tracking-[0.22em] opacity-75"
                         >
-                            <div className="absolute inset-0 bg-white/15 rounded-full pointer-events-none" />
-                            <span className="text-[7cqw] leading-none mb-[0.8cqw] drop-shadow-md">
-                                {activeDept?.iconKey === 'leaf'
-                                    ? '🌱'
-                                    : activeDept?.iconKey === 'heart'
-                                      ? '🐾'
-                                      : '🏷️'}
-                            </span>
-                            <span
-                                style={{ fontFamily: brandKit.fontHeading }}
-                                className="font-black uppercase tracking-tight text-[3.2cqw] text-center leading-tight drop-shadow-sm max-w-[90%] truncate"
-                            >
-                                {activeDept?.label || brandKit.companyName}
-                            </span>
-                            <span className="mt-[1cqw] px-[2.5cqw] py-[0.5cqw] rounded-full bg-black/35 text-white font-extrabold text-[2cqw] tracking-wider uppercase">
-                                {metrics.mechanicBadgeText || 'OFERTA EXCLUSIVA'}
-                            </span>
-                        </div>
-                        {/* Sombra Elíptica de Ancoragem */}
-                        <div
-                            className="w-[36cqw] h-[3.5cqw] -mt-[1cqw] rounded-full"
-                            style={{
-                                background:
-                                    'radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 75%)',
-                            }}
-                        />
+                            Oferta oficial Coagro
+                        </span>
+                        <span
+                            style={{ fontFamily: brandKit.fontHeading }}
+                            className="mt-[1.4cqw] max-w-[90%] truncate text-[7cqw] font-black uppercase leading-none tracking-tight"
+                        >
+                            {activeDept?.label || 'GRUPO COAGRO'}
+                        </span>
+                        <span className="mt-[1.6cqw] px-[2.5cqw] py-[0.6cqw] font-mono text-[2cqw] font-extrabold uppercase tracking-wider text-white/90">
+                            {metrics.mechanicBadgeText || 'OFERTA EXCLUSIVA'}
+                        </span>
                     </div>
                 )}
 
@@ -1310,17 +1326,13 @@ export const GuidedCarouselCanvas: React.FC<GuidedCarouselCanvasProps> = ({
             {/* 1. TOPO: IDENTIDADE WHITE-LABEL + INDICADOR DE SLIDE E CÓD */}
             <div className="relative z-10 px-[6cqw] pt-[5cqw] flex items-center justify-between gap-[2cqw]">
                 <div className="flex items-center gap-[2cqw] min-w-0">
-                    {brandKit.defaultLogoUrl && (
-                        <img
-                            src={brandKit.defaultLogoUrl}
-                            alt={brandKit.companyName}
-                            className="h-[7cqw] max-w-[22cqw] object-contain bg-white/95 px-[1.4cqw] py-[0.5cqw] rounded-[1.2cqw] shadow-sm shrink-0"
-                        />
-                    )}
+                    <OfficialBrandLogo
+                        brandKit={brandKit}
+                        theme={theme}
+                        palette={palette}
+                        className="h-[7cqw] max-w-[22cqw]"
+                    />
                     <div className="flex flex-col min-w-0">
-                        <span className="font-black text-[4.2cqw] tracking-tight leading-none truncate">
-                            {brandKit.companyName}
-                        </span>
                         {brandKit.defaultBranchName && (
                             <span
                                 style={{ fontFamily: brandKit.fontBody }}
@@ -1369,7 +1381,7 @@ export const GuidedCarouselCanvas: React.FC<GuidedCarouselCanvasProps> = ({
                             backgroundColor: '#10B981',
                             color: '#FFFFFF',
                         }}
-                        className="absolute top-[5cqw] right-[6cqw] px-[3cqw] py-[0.8cqw] rounded-full text-[2cqw] font-black uppercase tracking-wider shadow-md z-20"
+                        className="self-end mb-[1.5cqw] px-[3cqw] py-[0.8cqw] rounded-full text-[2cqw] font-black uppercase tracking-wider shadow-md"
                     >
                         {activeDept?.label.toUpperCase() || 'OFERTA'}
                     </span>
@@ -1504,9 +1516,16 @@ export const HrAndNoticeCanvas: React.FC<HrAndNoticeCanvasProps> = ({
     theme,
     canvasRef,
 }) => {
-    const palette = resolveThemePalette(theme, brandKit);
-    const forensicId = generateHrForensicId(hrNotice, brandKit.companyName);
     const isA4 = hrNotice.outputFormat === 'A4_PRINT';
+    const isMuralA4 = isA4 && (hrNotice.channel === 'MURAL_A4' || !hrNotice.channel);
+    const effectiveTheme: VisualThemePreset = isMuralA4
+        ? theme
+        : theme === 'BW_ECO_TONER'
+          ? 'BRAND_PRIMARY'
+          : theme;
+    const palette = resolveThemePalette(effectiveTheme, brandKit);
+    const forensicId = generateHrForensicId(hrNotice, brandKit.companyName);
+    const safeCompanyName = (brandKit.companyName || 'Grupo Coagro').replace(/\s*\($/, '').trim();
 
     const archetypeBadge =
         hrNotice.archetype === 'JOB_VACANCY'
@@ -1528,13 +1547,14 @@ export const HrAndNoticeCanvas: React.FC<HrAndNoticeCanvasProps> = ({
             }}
             data-sheet={isA4 ? 'a4-hr-notice' : 'social-hr-notice'}
             data-hr-archetype={hrNotice.archetype}
+            data-hr-channel={hrNotice.channel || 'MURAL_A4'}
             data-sku-code={hrNotice.referenceCode}
             data-brand-name={brandKit.companyName}
             data-font-heading={brandKit.fontHeading}
             data-font-body={brandKit.fontBody}
             className={`relative w-full ${
                 isA4 ? 'aspect-[1/1.414]' : 'aspect-[4/5]'
-            } overflow-hidden shadow-2xl border-2 border-slate-900 select-none flex flex-col justify-between bg-white`}
+            } overflow-hidden shadow-2xl select-none flex flex-col justify-between bg-white`}
         >
             {/* 1. CABEÇALHO INSTITUCIONAL WHITE-LABEL */}
             <div
@@ -1542,19 +1562,25 @@ export const HrAndNoticeCanvas: React.FC<HrAndNoticeCanvasProps> = ({
                     backgroundColor: palette.headerBg,
                     color: palette.headerText,
                 }}
-                className="px-[5.5cqw] py-[4cqw] border-b-[0.5cqw] border-slate-900 flex flex-col gap-[1.5cqw]"
+                className="px-[5.5cqw] py-[4cqw] border-b-[0.5cqw] flex flex-col gap-[1.5cqw]"
             >
                 <div className="flex items-center justify-between gap-[2cqw]">
                     <div className="flex items-center gap-[2cqw] min-w-0">
-                        {brandKit.defaultLogoUrl && (
+                        {brandKit.defaultLogoUrl ? (
                             <img
                                 src={brandKit.defaultLogoUrl}
                                 alt={brandKit.companyName}
                                 className="h-[6.5cqw] max-w-[22cqw] object-contain bg-white px-[1.2cqw] py-[0.5cqw] rounded-[1cqw] shrink-0"
                             />
+                        ) : theme === 'BW_ECO_TONER' ? (
+                            <LogoHorizontalMonoBranca className="h-[6.5cqw] max-w-[22cqw] w-auto shrink-0" />
+                        ) : brandKit.activeDepartmentId === 'dept-2' ? (
+                            <CoagroPetLogo className="h-[6.5cqw] max-w-[22cqw] w-auto bg-white px-[1.2cqw] py-[0.5cqw] rounded-[1cqw] shrink-0" />
+                        ) : (
+                            <LogoHorizontalBranca className="h-[6.5cqw] max-w-[22cqw] w-auto shrink-0" />
                         )}
                         <span className="font-black text-[3.8cqw] tracking-tight uppercase truncate">
-                            {brandKit.companyName}
+                            {safeCompanyName}
                         </span>
                     </div>
 
@@ -1699,8 +1725,9 @@ export const HrAndNoticeCanvas: React.FC<HrAndNoticeCanvasProps> = ({
                     backgroundColor: palette.headerBg,
                     color: palette.headerText,
                     fontFamily: brandKit.fontBody,
+                    borderColor: palette.headerBg,
                 }}
-                className="px-[5.5cqw] py-[2cqw] border-t-2 border-slate-900 flex items-center justify-between text-[2cqw] font-bold uppercase"
+                className="px-[5.5cqw] py-[2cqw] border-t-[0.4cqw] flex items-center justify-between text-[2cqw] font-bold uppercase"
             >
                 <span>
                     CÓD: {hrNotice.referenceCode} • {hrNotice.validityOrDeadlineText}

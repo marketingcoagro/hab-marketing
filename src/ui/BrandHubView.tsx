@@ -12,31 +12,57 @@ import {
 import {
   LogoHorizontalAzul,
   LogoHorizontalBranca,
-  CoagroPetLogo,
   CoagroSimboloCasinha,
 } from './coagroLogos';
+import {
+  CoagroBadgeTemplate,
+  CoagroBusinessCardTemplate,
+  CoagroEmailSignatureTemplate,
+  CoagroProfileTemplate,
+} from './CoagroIdentityTemplates';
 import { exportElementToPng, printOrSaveA4Sheet } from '../engine/exporter';
 import { DEFAULT_ERP_CATALOG_DB, formatBRL } from '../core/businessRules';
 import type { ErpCatalogRecord, RegulatoryCategory } from '../core/types';
 
-export type BrandHubTab = 'team' | 'documents' | 'assets' | 'directory' | 'campaigns';
+export type BrandHubTab =
+  | 'team'
+  | 'identification'
+  | 'documents'
+  | 'assets'
+  | 'directory'
+  | 'campaigns';
 
-export const BrandHubView: React.FC = () => {
+interface BrandHubViewProps {
+  initialTab?: BrandHubTab;
+  campaignsMode?: boolean;
+}
+
+export const BrandHubView: React.FC<BrandHubViewProps> = ({
+  initialTab = 'team',
+  campaignsMode = false,
+}) => {
   const state = useStudioStore();
   const activeStore = getCoagroStoreById(state.activeStoreId);
   const isPet =
     state.brandKit.activeDepartmentId === 'dept-2' ||
     activeStore.bandeira === 'COAGRO_PET';
 
-  const [activeTab, setActiveTab] = useState<BrandHubTab>('team');
+  const [activeTab, setActiveTab] = useState<BrandHubTab>(initialTab);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('camp-saldao');
   const [notice, setNotice] = useState<string | null>(null);
 
-  // Kit Colaborador (Assinatura, Cartão de Visita e Avatar WhatsApp)
-  const [collabName, setCollabName] = useState('Kaio Virgínio');
-  const [collabRole, setCollabRole] = useState('Gestor de Foco & Marketing');
+  // Kit Colaborador (Assinatura, Cartão de Visita e Perfil Institucional 1:1)
+  const [collabName, setCollabName] = useState('Kaio Araújo');
+  const [collabRole, setCollabRole] = useState('Analista de Marketing');
+  const [collabDepartment, setCollabDepartment] = useState('Marketing & Comunicação');
+  const [collabRegistration, setCollabRegistration] = useState('COA-001');
   const [collabPhone, setCollabPhone] = useState(activeStore.telefoneFormatado);
   const [collabEmail, setCollabEmail] = useState(activeStore.gerenteEmail);
   const [collabPhoto, setCollabPhoto] = useState<string | null>(null);
+  const [profileZoom, setProfileZoom] = useState(1);
+  const [profileOffsetX, setProfileOffsetX] = useState(0);
+  const [profileOffsetY, setProfileOffsetY] = useState(0);
+  const [profileShowBadge, setProfileShowBadge] = useState(true);
 
   // Papel Timbrado A4
   const [docTitle, setDocTitle] = useState('COMUNICADO OFICIAL DE FILIAL');
@@ -54,8 +80,9 @@ export const BrandHubView: React.FC = () => {
   const [catalogSearch, setCatalogSearch] = useState('');
 
   const signatureRef = useRef<HTMLDivElement>(null);
-  const businessCardRef = useRef<HTMLDivElement>(null);
-  const avatarRef = useRef<HTMLDivElement>(null);
+  const officialBusinessCardRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
   const letterheadRef = useRef<HTMLDivElement>(null);
 
   const flashNotice = (msg: string) => {
@@ -134,23 +161,34 @@ export const BrandHubView: React.FC = () => {
   };
 
   const handleCopySignatureHtml = async () => {
-    const html = `<table cellpadding="0" cellspacing="0" border="0" style="font-family:'Inter',Arial,sans-serif;color:#1f2937;font-size:13px;line-height:1.45;border-collapse:collapse;">
+    const accent = isPet ? '#001C71' : '#004d40';
+    const html = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="620" style="width:620px;max-width:100%;border-collapse:collapse;font-family:'Inter',Arial,sans-serif;background:#001C71;color:#ffffff;">
       <tr>
-        <td style="padding-right:16px;border-right:3px solid ${isPet ? '#001C71' : '#004d40'};vertical-align:middle;text-align:center;">
-          <div style="font-size:20px;font-weight:900;color:${isPet ? '#001C71' : '#004d40'};font-family:'Exo 2',Arial,sans-serif;">COAGRO</div>
-          <div style="font-size:9px;color:#ffab00;font-weight:bold;text-transform:uppercase;">${isPet ? 'Coagro Pet' : 'Grupo Coagro'}</div>
+        <td style="padding:22px 26px 10px;vertical-align:top;">
+          <div style="font-size:24px;font-weight:800;line-height:1.05;color:#ffffff;font-family:'Exo 2',Arial,sans-serif;">${collabName}</div>
+          <div style="font-size:15px;font-weight:600;color:#FFAB00;margin-top:4px;">${collabRole}</div>
+          <div style="font-size:12px;line-height:1.8;color:#ffffff;margin-top:14px;">
+            <div>Telefone / WhatsApp: <strong>${collabPhone}</strong></div>
+            <div>E-mail: <strong>${collabEmail}</strong></div>
+            <div>Instagram: <strong>@grupocoagro</strong> &nbsp;•&nbsp; Site: <strong>${COAGRO_CORPORATE_INFO.website}</strong></div>
+          </div>
         </td>
-        <td style="padding-left:16px;vertical-align:middle;">
-          <div style="font-size:15px;font-weight:bold;color:#111827;">${collabName}</div>
-          <div style="font-size:12px;color:${isPet ? '#001C71' : '#004d40'};font-weight:bold;margin-bottom:4px;">${collabRole} • ${activeStore.nome}</div>
-          <div style="font-size:11px;color:#4b5563;">WhatsApp: <strong>${collabPhone}</strong> • E-mail: <strong>${collabEmail}</strong></div>
-          <div style="font-size:10px;color:#6b7280;margin-top:2px;">${activeStore.endereco} - ${activeStore.cidade}/${activeStore.estado} • ${COAGRO_CORPORATE_INFO.website}</div>
+        <td style="width:8px;background:${accent};" aria-hidden="true"></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding:10px 26px 18px;border-top:1px solid rgba(255,171,0,0.35);">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="font-family:'Exo 2',Arial,sans-serif;font-size:18px;font-weight:900;color:#ffffff;">Coagro</td>
+              <td align="right" style="font-family:'Inter',Arial,sans-serif;font-size:10px;color:#FFAB00;font-weight:600;">${isPet ? 'Coagro Pet' : 'Grupo Coagro'} • Presente no campo e na sua vida</td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>`;
     try {
       await navigator.clipboard.writeText(html);
-      flashNotice('✅ Código HTML da Assinatura copiado para o Outlook/Webmail!');
+      flashNotice('✅ Assinatura HTML copiada para o Outlook/Webmail!');
     } catch {
       flashNotice('⚠️ Não foi possível copiar automaticamente.');
     }
@@ -172,6 +210,7 @@ export const BrandHubView: React.FC = () => {
   };
 
   const filteredStores = COAGRO_STORES.filter((s) => {
+    if (s.identityEnabled === false || s.bandeira === 'RB_AGRICOLA') return false;
     const matchUf = ufFilter === 'ALL' || s.estado === ufFilter;
     const q = storeSearch.toLowerCase();
     const matchText =
@@ -183,14 +222,15 @@ export const BrandHubView: React.FC = () => {
   });
 
   const agroColors = [
-    { name: 'Verde Safra (Primária Agro)', hex: '#004d40', use: 'Fundos institucionais Agro, cabeçalhos e botões' },
-    { name: 'Ouro Safra (Destaque / Acento)', hex: '#ffab00', use: 'Telhado da casinha, preços e selos de campanha' },
-    { name: 'Azul Titular Coagro', hex: '#001C71', use: 'Logotipo oficial COAGRO e contraste executivo' },
-    { name: 'Azul Celeste (Apoio / Pet)', hex: '#4897D0', use: 'Identidade Coagro Pet e tags técnicas' },
+    { name: 'Azul Oficial Coagro (Primária Titular)', hex: '#002B49', use: 'Logotipo oficial COAGRO, fundos institucionais e contraste executivo' },
+    { name: 'Verde Safra (Secundária Agro)', hex: '#004d40', use: 'Detalhes de apoio, categorias agrícolas e selos secundários' },
+    { name: 'Ouro Safra (Destaque & Preço)', hex: '#ffab00', use: 'Preços promocionais, chamadas de ação e acentos' },
+    { name: 'Azul Royal Pet (Coagro Pet)', hex: '#001C71', use: 'Exclusivo para unidades e departamento Coagro Pet' },
+    { name: 'Azul Celeste Pet (Apoio Pet)', hex: '#4897D0', use: 'Identidade Coagro Pet e tags técnicas' },
   ];
 
   return (
-    <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+    <div className="brand-hub-page p-4 sm:p-6 max-w-6xl mx-auto space-y-6" data-brand-system="coagro-v1">
       {notice && (
         <div className="p-3.5 rounded-2xl bg-[#004d40] text-white text-xs font-bold flex items-center justify-between shadow-md">
           <span>{notice}</span>
@@ -205,34 +245,39 @@ export const BrandHubView: React.FC = () => {
       )}
 
       {/* Cabeçalho e Abas do Brand Hub */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="brand-hub-hero bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#004d40] text-[#ffab00]">
-            Brand Hub &amp; Kit Corporativo • {activeStore.nome}
+            {campaignsMode ? 'Campanhas da rede' : 'Kit de marca'}
           </span>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-            Central de Padronização Institucional ({isPet ? 'Coagro Pet' : 'Grupo Coagro'})
+            {campaignsMode ? 'Campanhas e mídia oficial' : 'Marca, pessoas e materiais'}
           </h1>
           <p className="text-xs text-slate-500">
-            Assinaturas de e-mail, cartões de visita, avatar de WhatsApp, papel timbrado A4, vetores e diretório das 15 unidades.
+            {campaignsMode
+              ? 'Pacotes sazonais, criativos, vídeos e spots homologados para as unidades.'
+              : `Perfil, assinatura, cartão, papelaria e ativos oficiais de ${isPet ? 'Coagro Pet' : 'Grupo Coagro'}.`}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200">
-          {(
-            [
-              { id: 'team', label: '🪪 Kit Colaborador' },
-              { id: 'documents', label: '📄 Papel Timbrado A4' },
-              { id: 'assets', label: '🎨 Logos & Paleta Oficial' },
-              { id: 'directory', label: '🏬 15 Unidades & CNPJs' },
-              { id: 'campaigns', label: '📦 Campanhas & Media Library' },
-            ] as const
-          ).map((t) => (
+        {!campaignsMode && (
+          <div className="brand-hub-tabs flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200" role="tablist" aria-label="Categorias do Brand Hub">
+            {(
+              [
+                { id: 'team', label: 'Kit Colaborador' },
+                { id: 'identification', label: 'Crachá e cartão' },
+                { id: 'documents', label: 'Papel timbrado' },
+                { id: 'assets', label: 'Logos e paleta' },
+                { id: 'directory', label: 'Filiais e CNPJs' },
+              ] as const
+            ).map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setActiveTab(t.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
+              role="tab"
+              aria-selected={activeTab === t.id}
+              className={`brand-hub-tab px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer ${
                 activeTab === t.id
                   ? 'bg-[#004d40] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -241,7 +286,8 @@ export const BrandHubView: React.FC = () => {
               {t.label}
             </button>
           ))}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ABA 1: KIT CORPORATIVO DE COLABORADORES */}
@@ -250,7 +296,7 @@ export const BrandHubView: React.FC = () => {
           {/* Formulário Guiado */}
           <div className="lg:col-span-5 bg-white rounded-3xl p-5 border border-slate-200 space-y-4">
             <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 border-b border-slate-100 pb-2.5">
-              1. Dados do Colaborador
+              Dados do colaborador
             </h2>
 
             <div className="space-y-3">
@@ -284,6 +330,7 @@ export const BrandHubView: React.FC = () => {
                   type="text"
                   value={collabName}
                   onChange={(e) => setCollabName(e.target.value)}
+                  maxLength={42}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-900"
                 />
               </div>
@@ -296,8 +343,36 @@ export const BrandHubView: React.FC = () => {
                   type="text"
                   value={collabRole}
                   onChange={(e) => setCollabRole(e.target.value)}
+                  maxLength={36}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-900"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                    Setor / Departamento
+                  </label>
+                  <input
+                    type="text"
+                    value={collabDepartment}
+                    onChange={(e) => setCollabDepartment(e.target.value)}
+                    maxLength={30}
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                    Matrícula
+                  </label>
+                  <input
+                    type="text"
+                    value={collabRegistration}
+                    onChange={(e) => setCollabRegistration(e.target.value)}
+                    maxLength={16}
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-mono font-bold text-slate-900"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -309,6 +384,7 @@ export const BrandHubView: React.FC = () => {
                     type="text"
                     value={collabPhone}
                     onChange={(e) => setCollabPhone(e.target.value)}
+                    maxLength={20}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-900"
                   />
                 </div>
@@ -320,6 +396,7 @@ export const BrandHubView: React.FC = () => {
                     type="text"
                     value={collabEmail}
                     onChange={(e) => setCollabEmail(e.target.value)}
+                    maxLength={64}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-900"
                   />
                 </div>
@@ -327,7 +404,7 @@ export const BrandHubView: React.FC = () => {
 
               <div>
                 <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
-                  Foto do Colaborador (Opcional — Sincroniza Avatar e Assinatura)
+                  Foto do Colaborador (Opcional — Sincroniza todos os materiais)
                 </label>
                 <input
                   type="file"
@@ -336,170 +413,322 @@ export const BrandHubView: React.FC = () => {
                   className="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#004d40] file:text-white cursor-pointer"
                 />
               </div>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase text-slate-600">
+                    Ajuste da foto nos materiais
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileZoom(1);
+                      setProfileOffsetX(0);
+                      setProfileOffsetY(0);
+                    }}
+                    className="text-[11px] font-bold text-[#001C71] hover:underline cursor-pointer"
+                  >
+                    Centralizar
+                  </button>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[11px] font-bold text-slate-600 mb-0.5">
+                    <span>Zoom</span>
+                    <span className="font-mono">{Math.round(profileZoom * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.8}
+                    max={2.4}
+                    step={0.02}
+                    value={profileZoom}
+                    onChange={(e) => setProfileZoom(Number(e.target.value))}
+                    className="w-full accent-[#001C71] cursor-pointer"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <div className="flex justify-between text-[11px] font-bold text-slate-600 mb-0.5">
+                      <span>Horizontal</span>
+                      <span className="font-mono">{profileOffsetX}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={-30}
+                      max={30}
+                      step={1}
+                      value={profileOffsetX}
+                      onChange={(e) => setProfileOffsetX(Number(e.target.value))}
+                      className="w-full accent-[#001C71] cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[11px] font-bold text-slate-600 mb-0.5">
+                      <span>Vertical</span>
+                      <span className="font-mono">{profileOffsetY}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={-30}
+                      max={30}
+                      step={1}
+                      value={profileOffsetY}
+                      onChange={(e) => setProfileOffsetY(Number(e.target.value))}
+                      className="w-full accent-[#001C71] cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={profileShowBadge}
+                    onChange={(e) => setProfileShowBadge(e.target.checked)}
+                    className="w-4 h-4 rounded accent-[#001C71] cursor-pointer"
+                  />
+                  <span className="text-[11px] font-bold text-slate-700">
+                    Exibir Nome e Cargo na arte de perfil
+                  </span>
+                </label>
+              </div>
             </div>
           </div>
 
-          {/* Prévias Travadas: Assinatura, Cartão de Visita e Avatar */}
           <div className="lg:col-span-7 space-y-5">
-            {/* 1. Assinatura de E-mail */}
-            <div className="bg-white rounded-3xl p-5 border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black uppercase text-slate-800">
-                  Prévia 1: Assinatura de E-mail Oficial (Via Verde — Autoatendimento)
+          {/* Prévia 1: Perfil Institucional 1:1 */}
+          <div className="bg-white rounded-3xl p-5 border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <span className="inline-flex rounded-full bg-[#001C71]/10 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#001C71]">
+                  Template Oficial • 1080 × 1080 px
+                </span>
+                <h3 className="text-xs font-black uppercase text-slate-800 mt-1">
+                  Prévia 1: Foto de Perfil Institucional (1:1)
                 </h3>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleCopySignatureHtml}
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black cursor-pointer"
-                  >
-                    📋 Copiar HTML
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      exportElementToPng(
-                        signatureRef.current,
-                        `assinatura-${collabName.toLowerCase().replace(/\s+/g, '-')}.png`,
-                        900
-                      )
-                    }
-                    className="px-3 py-1.5 rounded-xl bg-[#004d40] text-[#ffab00] text-xs font-black cursor-pointer"
-                  >
-                    ⬇️ Baixar PNG
-                  </button>
-                </div>
               </div>
-
-              <div
-                ref={signatureRef}
-                className="p-5 rounded-2xl bg-white border border-slate-200 flex items-center gap-4"
+              <button
+                type="button"
+                onClick={() => {
+                  void exportElementToPng(
+                    profileRef.current,
+                    `perfil-institucional-${collabName.toLowerCase().replace(/\s+/g, '-') || 'coagro'}.png`,
+                    1080
+                  ).then(() => flashNotice('✅ Foto de perfil 1080×1080 baixada em PNG!'));
+                }}
+                className="px-3 py-1.5 rounded-xl bg-[#001C71] hover:bg-[#001247] text-[#ffab00] text-xs font-black cursor-pointer shrink-0"
               >
-                {collabPhoto ? (
-                  <img
-                    src={collabPhoto}
-                    alt={collabName}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-[#004d40] shrink-0"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 p-2">
-                    <CoagroSimboloCasinha className="w-10 h-10" />
-                  </div>
-                )}
+                ⬇️ Baixar PNG 1080
+              </button>
+            </div>
 
-                <div className="pr-4 border-r-2 border-[#004d40] shrink-0">
-                  {isPet ? (
-                    <CoagroPetLogo className="h-9 w-auto" />
-                  ) : (
-                    <LogoHorizontalAzul className="h-8 w-auto" />
-                  )}
-                </div>
+            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 flex justify-center">
+              <div className="w-full max-w-[360px]">
+                <CoagroProfileTemplate
+                  ref={profileRef}
+                  activeStore={activeStore}
+                  name={collabName}
+                  role={collabRole}
+                  department={collabDepartment}
+                  registration={collabRegistration}
+                  phone={collabPhone}
+                  email={collabEmail}
+                  photo={collabPhoto}
+                  zoom={profileZoom}
+                  offsetX={profileOffsetX}
+                  offsetY={profileOffsetY}
+                  showBadge={profileShowBadge}
+                  isPet={isPet}
+                />
+              </div>
+            </div>
+          </div>
 
-                <div className="space-y-0.5 text-xs">
-                  <div className="text-sm font-black text-slate-900">{collabName}</div>
-                  <div className="font-bold text-[#004d40]">
-                    {collabRole} • {activeStore.nome}
-                  </div>
-                  <div className="text-[11px] text-slate-600">
-                    WhatsApp: <strong>{collabPhone}</strong> • {collabEmail}
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    {activeStore.endereco} - {activeStore.cidade}/{activeStore.estado}
-                  </div>
-                </div>
+          {/* Prévia 2: Assinatura de E-mail Oficial (banner horizontal) */}
+          <div className="bg-white rounded-3xl p-5 border border-slate-200 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="inline-flex rounded-full bg-[#004d40]/10 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#004d40]">
+                  Template Oficial • Assinatura de E-mail
+                </span>
+                <h3 className="text-xs font-black uppercase text-slate-800 mt-1">
+                  Prévia 2: Assinatura de E-mail Coagro
+                </h3>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopySignatureHtml}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-black cursor-pointer"
+                >
+                  📋 Copiar HTML
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void exportElementToPng(
+                      signatureRef.current,
+                      `assinatura-email-${collabName.toLowerCase().replace(/\s+/g, '-') || 'coagro'}.png`,
+                      2000
+                    ).then(() => flashNotice('✅ Assinatura de e-mail baixada em PNG!'));
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-[#004d40] hover:bg-[#00382e] text-[#ffab00] text-xs font-black cursor-pointer"
+                >
+                  ⬇️ Baixar PNG
+                </button>
               </div>
             </div>
 
-            {/* 2. Cartão de Visita Oficial + Avatar de WhatsApp */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Cartão de Visita (9x5cm proporcional) */}
-              <div className="md:col-span-7 bg-white rounded-3xl p-5 border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase text-slate-800">
-                    Prévia 2: Cartão de Visita (9×5cm)
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={handleRequestPrintedCard}
-                    className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-[11px] font-black cursor-pointer"
-                  >
-                    📨 Solicitar Impressão Gráfica
-                  </button>
-                </div>
+            <div className="rounded-2xl bg-slate-50 border border-slate-200 p-3 overflow-hidden">
+              <CoagroEmailSignatureTemplate
+                ref={signatureRef}
+                activeStore={activeStore}
+                name={collabName}
+                role={collabRole}
+                department={collabDepartment}
+                registration={collabRegistration}
+                phone={collabPhone}
+                email={collabEmail}
+                photo={collabPhoto}
+                zoom={profileZoom}
+                offsetX={profileOffsetX}
+                offsetY={profileOffsetY}
+                isPet={isPet}
+              />
+            </div>
+            <p className="text-[11px] text-slate-500">
+              A exportação usa o mesmo motor dos materiais do Hub, preservando margens e proporções.
+            </p>
+          </div>
+          </div>
+        </div>
+      )}
 
-                <div
-                  ref={businessCardRef}
-                  className="aspect-[1.75/1] w-full rounded-2xl p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-md"
-                  style={{
-                    background: isPet
-                      ? 'linear-gradient(135deg, #001C71 0%, #0b2e99 100%)'
-                      : 'linear-gradient(135deg, #004d40 0%, #002b24 100%)',
-                  }}
-                >
-                  <div className="flex items-start justify-between">
-                    <LogoHorizontalBranca className="h-7 w-auto" />
-                    <span className="px-2 py-0.5 rounded bg-[#ffab00] text-slate-950 text-[9px] font-black uppercase">
-                      {activeStore.cidade}/{activeStore.estado}
-                    </span>
-                  </div>
-
-                  <div className="space-y-0.5">
-                    <div className="text-base font-black tracking-tight text-white">
-                      {collabName}
-                    </div>
-                    <div className="text-xs font-bold text-[#ffab00]">{collabRole}</div>
-                    <div className="text-[11px] text-white/90 pt-1">
-                      📱 {collabPhone} • ✉️ {collabEmail}
-                    </div>
-                    <div className="text-[10px] text-white/70">
-                      📍 {activeStore.endereco} • {activeStore.nome}
-                    </div>
-                  </div>
-                </div>
+      {/* ABA 1B: IDENTIFICAÇÃO OFICIAL — CRACHÁ E CARTÃO */}
+      {activeTab === 'identification' && (
+        <div className="brand-hub-identity space-y-6">
+          <div className="brand-hub-panel rounded-3xl border border-slate-200 bg-white p-6">
+            <div className="flex flex-col gap-2 border-b border-slate-100 pb-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <span className="brand-hub-kicker">Identificação oficial · modelos homologados</span>
+                <h2 className="mt-1 text-xl font-black tracking-tight text-slate-900">
+                  Crachá e cartão
+                </h2>
+                <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500">
+                  A composição é travada. Nome, cargo, foto e contatos vêm do Kit Colaborador,
+                  evitando cadastro duplicado.
+                </p>
               </div>
+              <span className="brand-hub-status">2 modelos oficiais</span>
+            </div>
 
-              {/* Avatar WhatsApp Corporativo */}
-              <div className="md:col-span-5 bg-white rounded-3xl p-5 border border-slate-200 space-y-3 flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase text-slate-800">
-                    Prévia 3: Avatar Zap
-                  </h3>
+            <div className="brand-hub-identity-summary mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <span className="brand-hub-kicker">Colaborador</span>
+                <strong className="mt-1 block truncate text-base font-black text-slate-900">
+                  {collabName}
+                </strong>
+                <span className="block truncate text-xs text-slate-500">
+                  {collabRole} · {collabDepartment}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-slate-500">
+                <span>Matrícula <strong className="font-mono text-slate-800">{collabRegistration}</strong></span>
+                <span>{collabPhone}</span>
+                <span className="hidden sm:inline">{collabEmail}</span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('team')}
+                  className="brand-hub-action brand-hub-action--muted"
+                >
+                  Editar no Kit Colaborador
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+              <section className="brand-hub-template-card rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <span className="brand-hub-kicker">Modelo 01 · vertical</span>
+                    <h3 className="mt-1 text-sm font-black text-slate-900">Crachá corporativo</h3>
+                  </div>
+                  <span className="brand-hub-locked">Travado</span>
+                </div>
+                <div className="flex justify-center">
+                  <CoagroBadgeTemplate
+                    ref={badgeRef}
+                    activeStore={activeStore}
+                    name={collabName}
+                    role={collabRole}
+                    department={collabDepartment}
+                    registration={collabRegistration}
+                    phone={collabPhone}
+                    email={collabEmail}
+                    photo={collabPhoto}
+                    isPet={isPet}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    exportElementToPng(
+                      badgeRef.current,
+                      `cracha-${collabName.toLowerCase().replace(/\s+/g, '-') || 'coagro'}.png`,
+                      1200
+                    )
+                  }
+                  className="brand-hub-action mt-4 w-full"
+                >
+                  ↓ Baixar crachá PNG
+                </button>
+              </section>
+
+              <section className="brand-hub-template-card rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <span className="brand-hub-kicker">Modelo 02 · 9 × 5 cm</span>
+                    <h3 className="mt-1 text-sm font-black text-slate-900">Cartão de visita oficial</h3>
+                  </div>
+                  <span className="brand-hub-locked">Travado</span>
+                </div>
+                <div className="flex min-h-[230px] items-center justify-center rounded-xl bg-[#f3f6f7] p-4">
+                  <CoagroBusinessCardTemplate
+                    ref={officialBusinessCardRef}
+                    activeStore={activeStore}
+                    name={collabName}
+                    role={collabRole}
+                    department={collabDepartment}
+                    registration={collabRegistration}
+                    phone={collabPhone}
+                    email={collabEmail}
+                    photo={collabPhoto}
+                  />
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() =>
                       exportElementToPng(
-                        avatarRef.current,
-                        `avatar-whatsapp-${activeStore.id}.png`,
-                        600
+                        officialBusinessCardRef.current,
+                        `cartao-${collabName.toLowerCase().replace(/\s+/g, '-') || 'coagro'}.png`,
+                        1200
                       )
                     }
-                    className="px-2.5 py-1 rounded-xl bg-[#004d40] text-[#ffab00] text-[11px] font-black cursor-pointer"
+                    className="brand-hub-action flex-1"
                   >
-                    ⬇️ PNG
+                    ↓ Baixar cartão PNG
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRequestPrintedCard}
+                    className="brand-hub-action brand-hub-action--muted flex-1"
+                  >
+                    📨 Solicitar gráfica
                   </button>
                 </div>
-
-                <div className="flex items-center justify-center py-1">
-                  <div
-                    ref={avatarRef}
-                    className="w-36 h-36 rounded-3xl flex flex-col items-center justify-between p-3 text-center text-white relative overflow-hidden shadow-md"
-                    style={{
-                      background: isPet ? '#001C71' : '#004d40',
-                      border: '4px solid #ffab00',
-                    }}
-                  >
-                    <CoagroSimboloCasinha className="w-11 h-11 mt-1" />
-                    <div>
-                      <div className="text-xs font-black uppercase leading-tight">
-                        {collabName.split(' ').slice(0, 2).join(' ')}
-                      </div>
-                      <div className="text-[9px] font-bold text-[#ffab00] uppercase mt-0.5">
-                        {activeStore.nome}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>
@@ -800,13 +1029,17 @@ export const BrandHubView: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {state.brandKit.seasonalCampaigns.map((camp) => {
                 const isActive = state.brandKit.activeCampaignId === camp.id;
+                const isSelected = selectedCampaignId === camp.id;
                 return (
                   <div
                     key={camp.id}
-                    className={`rounded-2xl p-5 border flex flex-col justify-between space-y-4 transition ${
-                      isActive
-                        ? 'border-[#ffab00] bg-amber-50/40 ring-2 ring-[#ffab00]/30'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    onClick={() => setSelectedCampaignId(camp.id)}
+                    className={`rounded-2xl p-5 border flex flex-col justify-between space-y-4 transition cursor-pointer ${
+                      isSelected
+                        ? 'border-[#002B49] bg-slate-50/80 ring-2 ring-[#002B49]/20 shadow-sm'
+                        : isActive
+                          ? 'border-[#ffab00] bg-amber-50/40 ring-2 ring-[#ffab00]/30'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
                     }`}
                   >
                     <div className="space-y-3">
@@ -821,11 +1054,15 @@ export const BrandHubView: React.FC = () => {
                         >
                           {camp.badgeText}
                         </span>
-                        {isActive && (
+                        {isActive ? (
                           <span className="px-2 py-0.5 rounded-md bg-[#004d40] text-[#ffab00] text-[10px] font-black uppercase">
                             Ativa no Estúdio
                           </span>
-                        )}
+                        ) : isSelected ? (
+                          <span className="px-2 py-0.5 rounded-md bg-slate-900 text-white text-[10px] font-black uppercase">
+                            Visualizando Pacote
+                          </span>
+                        ) : null}
                       </div>
 
                       <div>
@@ -844,7 +1081,8 @@ export const BrandHubView: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           studioActions.applyCampaignToStudio(camp.id, 'STORE_POSTER');
                           flashNotice(`⚡ Campanha "${camp.name}" aplicada no Módulo de Cartazes PDV!`);
                         }}
@@ -854,7 +1092,8 @@ export const BrandHubView: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           studioActions.applyCampaignToStudio(camp.id, 'SOCIAL_MEDIA');
                           flashNotice(`📱 Campanha "${camp.name}" aplicada no Módulo de Redes Sociais!`);
                         }}
@@ -867,6 +1106,195 @@ export const BrandHubView: React.FC = () => {
                 );
               })}
             </div>
+
+            {/* PAINEL DINÂMICO DE ATIVOS POR CAMPANHA SELECIONADA (SPRINT C) */}
+            {(() => {
+              const selectedCamp =
+                state.brandKit.seasonalCampaigns.find((c) => c.id === selectedCampaignId) ||
+                state.brandKit.seasonalCampaigns[0];
+              if (!selectedCamp) return null;
+
+              return (
+                <div className="mt-6 p-6 rounded-3xl bg-slate-50 border-2 border-slate-200/80 space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-2xs"
+                        style={{
+                          backgroundColor: selectedCamp.primaryColorHex,
+                          color: selectedCamp.accentColorHex,
+                          border: `1px solid ${selectedCamp.accentColorHex}40`,
+                        }}
+                      >
+                        {selectedCamp.badgeText}
+                      </span>
+                      <div>
+                        <h3 className="text-base font-black text-slate-900">
+                          Pacote Criativo Completo 360° — {selectedCamp.name}
+                        </h3>
+                        <p className="text-xs text-slate-500">
+                          {selectedCamp.description || 'Artes verticais, vídeos homologados por departamento e spots de rádio.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          studioActions.applyCampaignToStudio(selectedCamp.id, 'STORE_POSTER');
+                          flashNotice(`⚡ Campanha "${selectedCamp.name}" aplicada no Módulo de Cartazes PDV!`);
+                        }}
+                        className="py-2 px-3.5 rounded-xl bg-[#004d40] hover:bg-[#00382e] text-[#ffab00] text-xs font-black cursor-pointer transition shadow-2xs"
+                      >
+                        ⚡ Gerar Cartaz Desta Campanha
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          studioActions.applyCampaignToStudio(selectedCamp.id, 'SOCIAL_MEDIA');
+                          flashNotice(`📱 Campanha "${selectedCamp.name}" aplicada no Módulo de Redes Sociais!`);
+                        }}
+                        className="py-2 px-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black cursor-pointer transition shadow-2xs"
+                      >
+                        📱 Gerar Anúncio de Loja
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 1. Stories em Alta Resolução (1080x1920) */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                        <span>📱</span> Stories Verticais Oficiais (1080×1920 PNG)
+                      </h4>
+                      <span className="text-[11px] text-slate-500">3 variações oficiais prontas para status</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'st-1', label: 'Story 1: Ofertas de Abertura', highlight: 'QUEIMA DE SAFRA' },
+                        { id: 'st-2', label: 'Story 2: Destaques & SKUs', highlight: 'PRODUTOS SELECIONADOS' },
+                        { id: 'st-3', label: 'Story 3: Atendimento Balcão', highlight: `${activeStore.nome.toUpperCase()}` },
+                      ].map((st, i) => (
+                        <div
+                          key={st.id}
+                          className="p-4 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-3 shadow-2xs"
+                        >
+                          <div
+                            className="w-full aspect-[9/16] max-h-48 rounded-xl flex flex-col items-center justify-center p-3 text-center relative overflow-hidden"
+                            style={{
+                              backgroundColor: selectedCamp.primaryColorHex,
+                              color: selectedCamp.accentColorHex,
+                            }}
+                          >
+                            <div className="text-[10px] font-bold opacity-80 mb-1">STORY 0{i + 1}</div>
+                            <div className="text-xs font-black leading-tight uppercase px-2">{st.highlight}</div>
+                            <div className="mt-2 text-[9px] font-mono text-white/90">1080 × 1920 px</div>
+                          </div>
+
+                          <div>
+                            <div className="text-xs font-bold text-slate-800">{st.label}</div>
+                            <div className="text-[10px] text-slate-500">{activeStore.cidade}/{activeStore.estado}</div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              flashNotice(`📥 Baixando ${st.label} (1080x1920 PNG)...`);
+                            }}
+                            className="w-full py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold cursor-pointer"
+                          >
+                            📥 Baixar PNG 1080×1920
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 2. Vídeos por Departamento */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                      <span>🎬</span> Vídeos Promocionais por Departamento (Reels &amp; TV de Loja)
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                      {[
+                        { dept: 'Nutrição Animal', icon: '🐮', title: 'Linha Bovigold & Pastagem', dur: '0:30' },
+                        { dept: 'Defensivos Agrícolas', icon: '🌾', title: 'Herbicidas & Fungicidas MAPA', dur: '0:30' },
+                        { dept: 'Máquinas & Ferramentas', icon: '🚜', title: 'Equipamentos & Pulverização', dur: '0:15' },
+                        { dept: 'Coagro Pet', icon: '🐾', title: 'Rações Premium & Antiparasitários', dur: '0:15' },
+                      ].map((vid) => (
+                        <div
+                          key={vid.dept}
+                          className="p-3.5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-2.5 shadow-2xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg">{vid.icon}</span>
+                            <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-black font-mono">
+                              {vid.dur}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500">{vid.dept}</div>
+                            <div className="text-xs font-black text-slate-900 leading-tight">{vid.title}</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => flashNotice(`📥 Baixando vídeo promocional de ${vid.dept} (${vid.dur} MP4)...`)}
+                            className="w-full py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold cursor-pointer"
+                          >
+                            📥 Baixar Vídeo MP4
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. Spots de Rádio Coagro */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                      <span>🎙️</span> Spots da Rádio Coagro (Som Ambiente &amp; Rádio Local)
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        { title: `Spot 15s — ${selectedCamp.name} (Flash Rápido)`, dur: 15, file: `spot-15s-${selectedCamp.id}.mp3` },
+                        { title: `Spot 30s — ${selectedCamp.name} (Chamada Completa)`, dur: 30, file: `spot-30s-${selectedCamp.id}.mp3` },
+                      ].map((audio) => (
+                        <div
+                          key={audio.dur}
+                          className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 shadow-2xs"
+                        >
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => flashNotice(`▶ Reproduzindo ${audio.title} no som ambiente...`)}
+                              className="w-10 h-10 rounded-full bg-[#002B49] text-[#ffab00] flex items-center justify-center font-bold text-sm shrink-0 cursor-pointer shadow-2xs"
+                              title="Ouvir spot"
+                            >
+                              ▶
+                            </button>
+                            <div>
+                              <div className="text-xs font-black text-slate-900">{audio.title}</div>
+                              <div className="text-[10px] text-slate-500 font-medium">Áudio oficial homologado • {audio.dur} segundos • MP3 320kbps</div>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => flashNotice(`📥 Baixando ${audio.file}...`)}
+                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold cursor-pointer shrink-0"
+                          >
+                            📥 Baixar MP3
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Galeria de Produtos Homologados (Media Library Coagro) */}

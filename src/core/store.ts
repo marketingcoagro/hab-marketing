@@ -31,6 +31,10 @@ import {
     MarketingRequestStatus,
     BannerFaixaDraft,
     RadioSpotDraft,
+    COAGRO_OFFICIAL_FONT_HEADING,
+    COAGRO_OFFICIAL_FONT_BODY,
+    COAGRO_OFFICIAL_POSTER_ARCHETYPE,
+    COAGRO_POSTER_TEMPLATE_CATALOG,
 } from './types';
 import { sendLeadCapturedToN8n } from '../utils/leadWebhook';
 import { getCoagroStoreById } from './coagroStores';
@@ -67,15 +71,15 @@ const STORAGE_KEY = 'coagro_marketing_hub_state_v1';
 const enricherService = new SmartProductEnricherService();
 
 export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
-    schemaVersion: 5,
-    activeStoreId: 'catedral',
+    schemaVersion: 6,
+    activeStoreId: 'expedicionario',
     userRole: 'STORE_MANAGER',
     planTier: 'ENTERPRISE',
     activeModule: 'STORE_POSTER',
     leadProfile: {
         name: 'Gerência de Filial',
-        storeName: 'Coagro Catedral',
-        whatsappOrEmail: 'gerente.catedral@grupocoagro.com.br',
+        storeName: 'Coagro Expedicionário',
+        whatsappOrEmail: 'gerente.expedicionario@grupocoagro.com.br',
         branchCount: '15 unidades',
         authProvider: 'direct',
     },
@@ -84,12 +88,12 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
         companyName: 'Grupo Coagro',
         typographyPresetId: 'AGRO_ROBUST',
         visualStylePreset: 'AGRO_BRUTALIST',
-        fontHeading: "'Exo 2', 'Montserrat', sans-serif",
-        fontBody: "'Inter', system-ui, sans-serif",
+        fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+        fontBody: COAGRO_OFFICIAL_FONT_BODY,
         mapaRegistrationCode: 'MAPA: AL/SE/BA-02895',
-        defaultPhoneWhatsapp: '(82) 98836-0271',
-        defaultBranchName: 'Coagro Catedral',
-        alertPrimaryColorHex: '#004d40',
+        defaultPhoneWhatsapp: '(82) 98836-0275',
+        defaultBranchName: 'Coagro Expedicionário',
+        alertPrimaryColorHex: '#002B49',
         alertAccentColorHex: '#ffab00',
         enableSubDepartments: true,
         activeDepartmentId: 'dept-1',
@@ -98,9 +102,10 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
                 id: 'dept-1',
                 label: 'Grupo Coagro (Agro)',
                 iconKey: 'leaf',
-                primaryColorHex: '#004d40',   // Verde Safra Oficial Coagro
-                secondaryColorHex: '#00382e',
+                primaryColorHex: '#002B49',   // Azul Oficial da Logotipo Coagro
+                secondaryColorHex: '#004d40', // Verde-Safra Institucional
                 accentColorHex: '#ffab00',    // Ouro Safra Oficial Coagro
+                enabled: true,
             },
             {
                 id: 'dept-2',
@@ -109,14 +114,16 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
                 primaryColorHex: '#001C71',   // Azul Royal Pet Oficial
                 secondaryColorHex: '#4897D0', // Azul Celeste Pet Oficial
                 accentColorHex: '#ffab00',    // Ouro Destaque Pet
+                enabled: true,
             },
             {
                 id: 'dept-3',
                 label: 'RB Agrícola',
                 iconKey: 'shield',
-                primaryColorHex: '#004d40',
+                primaryColorHex: '#002B49',
                 secondaryColorHex: '#386A27',
                 accentColorHex: '#F0A01B',
+                enabled: false,
             },
         ],
         seasonalCampaigns: [
@@ -124,22 +131,41 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
                 id: 'camp-saldao',
                 name: 'Saldão Coagro',
                 badgeText: 'SALDÃO COAGRO',
-                primaryColorHex: '#004d40',
+                primaryColorHex: '#002B49',
                 accentColorHex: '#ffab00',
+                description: 'Ação comercial de grande impacto e queima de estoque em todas as filiais.',
+            },
+            {
+                id: 'camp-black-friday',
+                name: 'Black Friday Coagro',
+                badgeText: 'BLACK FRIDAY COAGRO',
+                primaryColorHex: '#0f172a',
+                accentColorHex: '#ffab00',
+                description: 'Visual dark/gold premium com descontos agressivos para safra e ferramentas.',
             },
             {
                 id: 'camp-sabadao',
                 name: 'Sabadão do Produtor',
-                badgeText: 'SABADÃO COAGRO',
-                primaryColorHex: '#001C71',
+                badgeText: 'SABADÃO DO PRODUTOR',
+                primaryColorHex: '#004d40',
                 accentColorHex: '#ffab00',
+                description: 'Ação semanal de balcão aos sábados com foco no produtor rural e pastagem.',
             },
             {
-                id: 'camp-irrigacao',
-                name: 'Campanha Irrigação & Pastagem',
-                badgeText: 'SAFRA & IRRIGAÇÃO',
-                primaryColorHex: '#004d40',
-                accentColorHex: '#4897D0',
+                id: 'camp-fechames',
+                name: 'Fecha Mês Coagro',
+                badgeText: 'FECHA MÊS COAGRO',
+                primaryColorHex: '#002B49',
+                accentColorHex: '#f59e0b',
+                description: 'Últimos dias do mês para bater metas de faturamento e zerar lotes.',
+            },
+            {
+                id: 'camp-natal',
+                name: 'Natal Coagro',
+                badgeText: 'NATAL COAGRO',
+                primaryColorHex: '#991b1b',
+                accentColorHex: '#ffab00',
+                description: 'Campanha de fim de ano institucional e de presentes na Coagro Pet e Agro.',
             },
         ],
     },
@@ -150,7 +176,7 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
     posterConfig: {
         printGrid: 'A4_FULL',
         visualTheme: 'BW_ECO_TONER',
-        layoutArchetype: 'PROMO_CLASSIC_V',
+        layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
         showDiscountPercentageBadge: true,
         showPricePerKgOrLiter: true,
         batchMode: false,
@@ -266,9 +292,10 @@ export const DEFAULT_INITIAL_STATE: StudioGlobalState = {
         startDateISO: '2026-11-10',
         endDateISO: '2026-11-30',
         scriptText:
-            'Atenção, amigo produtor e cliente da Coagro Catedral! Chegou a hora de garantir economia de verdade para a sua propriedade. Aproveite Herbicida Hexazinona e Linha Ourofino com preço de lote por apenas R$ 549,90 à vista! Estoque pronto para retirada imediata no balcão ou entrega rápida. Fale agora com um de nossos consultores técnicos na Coagro Catedral. Grupo Coagro, quem planta confiança colhe resultado!',
-        targetStoreIds: ['catedral', 'aracaju', 'lagarto'],
+            'Atenção, amigo produtor e cliente da Coagro Expedicionário! Chegou a hora de garantir economia de verdade para a sua propriedade. Aproveite Herbicida Hexazinona e Linha Ourofino com preço de lote por apenas R$ 549,90 à vista! Estoque pronto para retirada imediata no balcão ou entrega rápida. Fale agora com um de nossos consultores técnicos na Coagro Expedicionário. Grupo Coagro, quem planta confiança colhe resultado!',
+        targetStoreIds: ['expedicionario', 'aracaju', 'lagarto'],
         priority: 1,
+        mentionStoreName: true,
     },
     marketingRequests: [
         {
@@ -396,21 +423,84 @@ function loadInitialState(): StudioGlobalState {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (!raw) return DEFAULT_INITIAL_STATE;
         const parsed = JSON.parse(raw);
+        const savedStore = getCoagroStoreById(parsed.activeStoreId);
+        const migratedStoreId =
+            parsed.activeStoreId === 'catedral' ||
+            parsed.activeStoreId === '15-de-novembro' ||
+            !parsed.activeStoreId ||
+            savedStore.bandeira === 'RB_AGRICOLA'
+                ? 'expedicionario'
+                : parsed.activeStoreId;
+
+        const savedDepartments = Array.isArray(parsed.brandKit?.departments)
+            ? (parsed.brandKit.departments as SubBrandDepartment[])
+            : DEFAULT_INITIAL_STATE.brandKit.departments;
+        const mergedDepartments: SubBrandDepartment[] = savedDepartments.map((d: SubBrandDepartment) => {
+            if (d.id === 'dept-1') {
+                return {
+                    ...d,
+                    label: 'Grupo Coagro (Agro)',
+                    primaryColorHex: '#002B49',
+                    secondaryColorHex: '#004d40',
+                    accentColorHex: '#ffab00',
+                    enabled: true,
+                };
+            }
+            if (d.id === 'dept-2') {
+                return {
+                    ...d,
+                    label: 'Coagro Pet',
+                    primaryColorHex: '#001C71',
+                    secondaryColorHex: '#4897D0',
+                    accentColorHex: '#ffab00',
+                    enabled: true,
+                };
+            }
+            return { ...d, enabled: false };
+        });
+
+        for (const officialDept of DEFAULT_INITIAL_STATE.brandKit.departments.slice(0, 2)) {
+            if (!mergedDepartments.some((d) => d.id === officialDept.id)) {
+                mergedDepartments.push({ ...officialDept });
+            }
+        }
+
+        const migratedStore = getCoagroStoreById(migratedStoreId);
+        const migratedCompanyName = migratedStore.bandeira === 'COAGRO_PET'
+            ? 'Coagro Pet'
+            : 'Grupo Coagro';
+        const migratedDepartmentId = migratedStore.bandeira === 'COAGRO_PET'
+            ? 'dept-2'
+            : parsed.brandKit?.activeDepartmentId === 'dept-2'
+              ? 'dept-2'
+              : 'dept-1';
+        const migratedRadioDraft: RadioSpotDraft = {
+            ...DEFAULT_INITIAL_STATE.radioSpotDraft,
+            ...(parsed.radioSpotDraft || {}),
+        };
+        const migratedRadioTargets = migratedRadioDraft.mentionStoreName !== false
+            ? [migratedStoreId]
+            : migratedRadioDraft.targetStoreIds;
+
         return {
             ...DEFAULT_INITIAL_STATE,
             ...parsed,
-            schemaVersion: 5,
-            activeStoreId: parsed.activeStoreId || DEFAULT_INITIAL_STATE.activeStoreId,
+            schemaVersion: 6,
+            activeStoreId: migratedStoreId,
             userRole: parsed.userRole || DEFAULT_INITIAL_STATE.userRole,
             brandKit: {
                 ...DEFAULT_INITIAL_STATE.brandKit,
                 ...(parsed.brandKit || {}),
-                departments: parsed.brandKit?.departments?.length
-                    ? parsed.brandKit.departments
-                    : DEFAULT_INITIAL_STATE.brandKit.departments,
-                seasonalCampaigns: parsed.brandKit?.seasonalCampaigns?.length
-                    ? parsed.brandKit.seasonalCampaigns
-                    : DEFAULT_INITIAL_STATE.brandKit.seasonalCampaigns,
+                companyName: migratedCompanyName,
+                typographyPresetId: 'AGRO_ROBUST',
+                fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+                fontBody: COAGRO_OFFICIAL_FONT_BODY,
+                activeDepartmentId: migratedDepartmentId,
+                defaultBranchName:
+                    migratedStore.nome,
+                defaultPhoneWhatsapp: migratedStore.telefoneFormatado,
+                departments: mergedDepartments,
+                seasonalCampaigns: DEFAULT_INITIAL_STATE.brandKit.seasonalCampaigns,
             },
             freemiumQuota: {
                 ...DEFAULT_INITIAL_STATE.freemiumQuota,
@@ -420,10 +510,12 @@ function loadInitialState(): StudioGlobalState {
             posterConfig: {
                 ...DEFAULT_INITIAL_STATE.posterConfig,
                 ...(parsed.posterConfig || {}),
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
             },
             socialConfig: {
                 ...DEFAULT_INITIAL_STATE.socialConfig,
                 ...(parsed.socialConfig || {}),
+                aspectRatio: parsed.socialConfig?.aspectRatio === 'STORY_9_16' ? 'STORY_9_16' : 'FEED_4_5',
             },
             currentOffer: {
                 ...DEFAULT_INITIAL_STATE.currentOffer,
@@ -466,8 +558,9 @@ function loadInitialState(): StudioGlobalState {
                 ...(parsed.bannerFaixaDraft || {}),
             },
             radioSpotDraft: {
-                ...DEFAULT_INITIAL_STATE.radioSpotDraft,
-                ...(parsed.radioSpotDraft || {}),
+                ...migratedRadioDraft,
+                targetStoreIds: migratedRadioTargets,
+                scriptText: buildRadioSpotScript(migratedRadioDraft, migratedStore.nome),
             },
             marketingRequests:
                 Array.isArray(parsed.marketingRequests) && parsed.marketingRequests.length > 0
@@ -526,16 +619,21 @@ export const studioActions = {
     },
 
     setActiveDepartment(deptId: string) {
-        setState((s) => ({
-            ...s,
-            brandKit: { ...s.brandKit, activeDepartmentId: deptId },
-        }));
+        setState((s) => {
+            const target = s.brandKit.departments.find((dept) => dept.id === deptId);
+            const nextDepartmentId = target?.enabled === false || !target ? 'dept-1' : deptId;
+            return {
+                ...s,
+                brandKit: { ...s.brandKit, activeDepartmentId: nextDepartmentId },
+            };
+        });
     },
 
     setCompanyName(companyName: string) {
+        const officialName = companyName.toLowerCase().includes('pet') ? 'Coagro Pet' : 'Grupo Coagro';
         setState((s) => ({
             ...s,
-            brandKit: { ...s.brandKit, companyName: companyName.trim() },
+            brandKit: { ...s.brandKit, companyName: officialName },
         }));
     },
 
@@ -545,7 +643,18 @@ export const studioActions = {
         }
         setState((s) => ({
             ...s,
-            brandKit: { ...s.brandKit, ...partial },
+            brandKit: {
+                ...s.brandKit,
+                ...partial,
+                companyName: partial.companyName?.toLowerCase().includes('pet')
+                    ? 'Coagro Pet'
+                    : partial.companyName !== undefined
+                      ? 'Grupo Coagro'
+                      : s.brandKit.companyName,
+                typographyPresetId: 'AGRO_ROBUST',
+                fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+                fontBody: COAGRO_OFFICIAL_FONT_BODY,
+            },
         }));
     },
 
@@ -558,22 +667,22 @@ export const studioActions = {
 
     applyTypographyPreset(presetId: TypographyPresetId) {
         const preset = WHITE_LABEL_TYPOGRAPHY_PRESETS.find((p) => p.id === presetId);
-        if (!preset) return;
+        if (!preset || preset.enabled === false) return;
         setState((s) => ({
             ...s,
             brandKit: {
                 ...s.brandKit,
-                typographyPresetId: preset.id,
-                fontHeading: preset.fontHeading,
-                fontBody: preset.fontBody,
+                typographyPresetId: 'AGRO_ROBUST',
+                fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+                fontBody: COAGRO_OFFICIAL_FONT_BODY,
             },
         }));
     },
 
     applySegmentPreset(segmentId: string) {
         const seg = WHITE_LABEL_SEGMENT_PRESETS.find((p) => p.id === segmentId);
-        if (!seg) return;
-        const typo = WHITE_LABEL_TYPOGRAPHY_PRESETS.find((t) => t.id === seg.typographyPresetId);
+        const legacySegmentPresetsEnabled = false;
+        if (!seg || !legacySegmentPresetsEnabled) return;
         setState((s) => {
             const currentDepts = s.brandKit.departments;
             const dept1Id = currentDepts[0]?.id || 'dept-1';
@@ -582,9 +691,9 @@ export const studioActions = {
                 ...s,
                 brandKit: {
                     ...s.brandKit,
-                    typographyPresetId: seg.typographyPresetId,
-                    fontHeading: typo ? typo.fontHeading : s.brandKit.fontHeading,
-                    fontBody: typo ? typo.fontBody : s.brandKit.fontBody,
+                    typographyPresetId: 'AGRO_ROBUST',
+                    fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+                    fontBody: COAGRO_OFFICIAL_FONT_BODY,
                     departments: [
                         {
                             id: dept1Id,
@@ -601,6 +710,7 @@ export const studioActions = {
     },
 
     updateDepartment(deptId: string, partial: Partial<SubBrandDepartment>) {
+        if (deptId !== 'dept-1' && deptId !== 'dept-2') return;
         setState((s) => ({
             ...s,
             brandKit: {
@@ -863,7 +973,7 @@ export const studioActions = {
             ...s,
             posterConfig: {
                 ...s.posterConfig,
-                layoutArchetype: 'MACHINERY_INSTALLMENT',
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
             },
             currentOffer: {
                 ...s.currentOffer,
@@ -878,7 +988,7 @@ export const studioActions = {
             ...s,
             posterConfig: {
                 ...s.posterConfig,
-                layoutArchetype: 'CONDITION_ADVANTAGE',
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
             },
             currentOffer: {
                 ...s.currentOffer,
@@ -890,19 +1000,11 @@ export const studioActions = {
 
     applyCatalogRecord(found: ErpCatalogRecord): boolean {
         if (!found) return false;
-        const targetArchetype = resolveRecommendedArchetype(
-            found.mechanicType,
-            found.priceFrom,
-            found.priceTo
-        );
-
         setState((s) => ({
             ...s,
             posterConfig: {
                 ...s.posterConfig,
-                layoutArchetype: s.erpSyncConfig.autoApplyArchetypeOnLookup
-                    ? targetArchetype
-                    : s.posterConfig.layoutArchetype,
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
             },
             currentOffer: {
                 ...s.currentOffer,
@@ -963,7 +1065,7 @@ export const studioActions = {
             ...s,
             posterConfig: {
                 ...s.posterConfig,
-                layoutArchetype: parsed.recommendedArchetype,
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
             },
             currentOffer: {
                 ...s.currentOffer,
@@ -1154,9 +1256,11 @@ export const studioActions = {
     },
 
     setPosterLayoutArchetype(layoutArchetype: PosterLayoutArchetype) {
+        const template = COAGRO_POSTER_TEMPLATE_CATALOG.find((item) => item.id === layoutArchetype);
+        if (!template?.enabled) return;
         setState((s) => ({
             ...s,
-            posterConfig: { ...s.posterConfig, layoutArchetype },
+            posterConfig: { ...s.posterConfig, layoutArchetype: template.id },
         }));
     },
 
@@ -1175,9 +1279,10 @@ export const studioActions = {
     },
 
     setSocialAspectRatio(aspectRatio: SocialAspectRatio) {
+        const officialAspect = aspectRatio === 'SQUARE_1_1' ? 'FEED_4_5' : aspectRatio;
         setState((s) => ({
             ...s,
-            socialConfig: { ...s.socialConfig, aspectRatio },
+            socialConfig: { ...s.socialConfig, aspectRatio: officialAspect },
         }));
     },
 
@@ -1217,36 +1322,14 @@ export const studioActions = {
     },
 
     setMechanicType(mechanicType: CommercialMechanicType) {
-        setState((s) => {
-            const nextArchetype: PosterLayoutArchetype =
-                mechanicType === 'INSTALLMENT_FINANCING'
-                    ? 'MACHINERY_INSTALLMENT'
-                    : mechanicType === 'BUY_WIN_GIFT' ||
-                        mechanicType === 'TAKE_X_PAY_Y' ||
-                        mechanicType === 'SECOND_UNIT_50' ||
-                        mechanicType === 'WHOLESALE_VOLUME' ||
-                        mechanicType === 'LOYALTY_CLUB' ||
-                        mechanicType === 'COMBO_ADVANTAGE'
-                      ? 'COMBO_ADVANTAGE'
-                      : s.posterConfig.layoutArchetype === 'MACHINERY_INSTALLMENT' ||
-                          s.posterConfig.layoutArchetype === 'CONDITION_ADVANTAGE' ||
-                          s.posterConfig.layoutArchetype === 'COMBO_ADVANTAGE'
-                        ? resolveRecommendedArchetype(
-                              mechanicType,
-                              s.currentOffer.priceFrom,
-                              s.currentOffer.priceToRaw
-                          )
-                        : s.posterConfig.layoutArchetype;
-
-            return {
-                ...s,
-                posterConfig: {
-                    ...s.posterConfig,
-                    layoutArchetype: nextArchetype,
-                },
-                currentOffer: { ...s.currentOffer, mechanicType },
-            };
-        });
+        setState((s) => ({
+            ...s,
+            posterConfig: {
+                ...s.posterConfig,
+                layoutArchetype: COAGRO_OFFICIAL_POSTER_ARCHETYPE,
+            },
+            currentOffer: { ...s.currentOffer, mechanicType },
+        }));
     },
 
     setRegulatoryCategory(regulatoryCategory: RegulatoryCategory) {
@@ -1548,6 +1631,10 @@ export const studioActions = {
                 alertPrimaryColorHex: camp.primaryColorHex,
                 alertAccentColorHex: camp.accentColorHex,
             },
+            currentOffer: {
+                ...s.currentOffer,
+                headerLabel: camp.badgeText,
+            },
             posterConfig: {
                 ...s.posterConfig,
                 visualTheme: 'CAMPAIGN_SEASONAL',
@@ -1644,19 +1731,18 @@ export const studioActions = {
     // HUB COAGRO: SELEÇÃO DE FILIAL, RBAC, FILA DO CURADOR & DICIONÁRIO AGRO
     // ========================================================================
     setActiveStore(storeId: string) {
-        const store = getCoagroStoreById(storeId);
+        const requestedStore = getCoagroStoreById(storeId);
+        const store = requestedStore.bandeira === 'RB_AGRICOLA'
+            ? getCoagroStoreById('expedicionario')
+            : requestedStore;
         const deptId =
             store.bandeira === 'COAGRO_PET'
                 ? 'dept-2'
-                : store.bandeira === 'RB_AGRICOLA'
-                  ? 'dept-3'
-                  : 'dept-1';
+                : 'dept-1';
         const companyName =
             store.bandeira === 'COAGRO_PET'
                 ? 'Coagro Pet'
-                : store.bandeira === 'RB_AGRICOLA'
-                  ? 'RB Agrícola'
-                  : 'Grupo Coagro';
+                : 'Grupo Coagro';
 
         setState((s) => ({
             ...s,
@@ -1667,6 +1753,13 @@ export const studioActions = {
                 activeDepartmentId: deptId,
                 defaultBranchName: store.nome,
                 defaultPhoneWhatsapp: store.telefoneFormatado,
+                fontHeading: COAGRO_OFFICIAL_FONT_HEADING,
+                fontBody: COAGRO_OFFICIAL_FONT_BODY,
+            },
+            radioSpotDraft: {
+                ...s.radioSpotDraft,
+                targetStoreIds: [store.id],
+                scriptText: buildRadioSpotScript(s.radioSpotDraft, store.nome),
             },
         }));
     },
@@ -1689,13 +1782,26 @@ export const studioActions = {
     },
 
     updateRadioSpotDraft(patch: Partial<RadioSpotDraft>) {
-        setState((s) => ({
-            ...s,
-            radioSpotDraft: {
-                ...s.radioSpotDraft,
-                ...patch,
-            },
-        }));
+        setState((s) => {
+            const nextDraft = { ...s.radioSpotDraft, ...patch };
+            const shouldRegenerate = [
+                'spotType',
+                'durationSeconds',
+                'productOrSubject',
+                'priceText',
+                'mentionStoreName',
+                'targetStoreIds',
+            ].some((key) => key in patch);
+            return {
+                ...s,
+                radioSpotDraft: {
+                    ...nextDraft,
+                    scriptText: shouldRegenerate
+                        ? buildRadioSpotScript(nextDraft, getCoagroStoreById(s.activeStoreId).nome)
+                        : nextDraft.scriptText,
+                },
+            };
+        });
     },
 
     autoGenerateRadioSpotScript() {

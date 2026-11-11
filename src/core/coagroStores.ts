@@ -18,6 +18,9 @@ export interface CoagroStore {
   gerenteResponsavel?: string;
   horarioFuncionamento: string;
   tipo: 'corporativo' | 'filial';
+  ativo: boolean;
+  hasPetDepartment: boolean;
+  identityEnabled?: boolean;
 }
 
 export const COAGRO_CORPORATE_INFO = {
@@ -53,6 +56,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteResponsavel: 'Diretoria Executiva',
     horarioFuncionamento: 'Seg a Sex: 08h às 18h',
     tipo: 'corporativo',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'cd-logistica',
@@ -71,6 +76,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteResponsavel: 'Supervisão de Logística',
     horarioFuncionamento: 'Seg a Sáb: 07h30 às 17h30',
     tipo: 'corporativo',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'entrega-rapida',
@@ -89,26 +96,11 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteResponsavel: 'Central de Despacho',
     horarioFuncionamento: 'Seg a Sáb: 07h30 às 18h',
     tipo: 'corporativo',
+    ativo: true,
+    hasPetDepartment: false,
   },
 
   // --- FILIAIS DE LOJA FÍSICA (ALAGOAS, SERGIPE E BAHIA) ---
-  {
-    id: 'catedral',
-    nome: 'Coagro Catedral',
-    razaoSocial: 'R B Dantas Ltda',
-    bandeira: 'COAGRO_AGRO',
-    cidade: 'Arapiraca',
-    estado: 'AL',
-    endereco: 'Praça Manoel Lúcio Correia, 76 - Centro',
-    cep: '57300-570',
-    cnpj: '02.895.028/0002-40',
-    telefone: '82988360271',
-    telefoneFormatado: '(82) 98836-0271',
-    mapUrl: 'https://goo.gl/maps/tFRvXvbHvk88wpdU9',
-    gerenteEmail: 'gerente.catedral@grupocoagro.com.br',
-    horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
-    tipo: 'filial',
-  },
   {
     id: 'expedicionario',
     nome: 'Coagro Expedicionário',
@@ -125,23 +117,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.expedicionario@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
-  },
-  {
-    id: '15-de-novembro',
-    nome: 'Coagro 15 de Novembro',
-    razaoSocial: 'R B Dantas Ltda',
-    bandeira: 'COAGRO_AGRO',
-    cidade: 'Arapiraca',
-    estado: 'AL',
-    endereco: 'R. Quinze de Novembro, 316 - Centro',
-    cep: '57300-340',
-    cnpj: '02.895.028/0007-55',
-    telefone: '82988360280',
-    telefoneFormatado: '(82) 98836-0280',
-    mapUrl: 'https://goo.gl/maps/rubhQxhGo1DanBKKA',
-    gerenteEmail: 'gerente.rua15@grupocoagro.com.br',
-    horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
-    tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: true,
   },
   {
     id: 'bananeira',
@@ -159,6 +136,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.bananeira@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'jatiuca',
@@ -176,6 +155,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.jatiuca@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 08h às 19h • Sáb: 08h às 16h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: true,
   },
   {
     id: 'canaa',
@@ -193,6 +174,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.canaa@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: true,
   },
   {
     id: 'delmiro',
@@ -210,6 +193,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.delmiro@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'olho-dagua',
@@ -227,6 +212,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.olhodagua@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'aracaju',
@@ -244,6 +231,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.aracaju@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: true,
   },
   {
     id: 'lagarto',
@@ -261,6 +250,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.lagarto@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'umbauba',
@@ -278,6 +269,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.umbauba@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'paripiranga',
@@ -295,6 +288,8 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.paripiranga@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 13h',
     tipo: 'filial',
+    ativo: true,
+    hasPetDepartment: false,
   },
   {
     id: 'rb-agricola',
@@ -312,13 +307,59 @@ export const COAGRO_STORES: CoagroStore[] = [
     gerenteEmail: 'gerente.rbagricola@grupocoagro.com.br',
     horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 12h',
     tipo: 'filial',
+    ativo: false,
+    hasPetDepartment: false,
+    identityEnabled: false,
+  },
+  {
+    id: 'rb-propria',
+    nome: 'RB Agrícola Propriá (Em Transição)',
+    razaoSocial: 'R B Dantas Ltda - Filial Propriá',
+    bandeira: 'RB_AGRICOLA',
+    cidade: 'Propriá',
+    estado: 'SE',
+    endereco: 'Rodovia BR-101 Km 15 - Zona Rural',
+    cep: '49900-000',
+    cnpj: '02.895.028/0020-22',
+    telefone: '79998000700',
+    telefoneFormatado: '(79) 99800-0700',
+    mapUrl: 'https://maps.app.goo.gl/KuiQSoJLRvEeAvGx6',
+    gerenteEmail: 'gerente.propria@grupocoagro.com.br',
+    horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 12h',
+    tipo: 'filial',
+    ativo: false,
+    hasPetDepartment: false,
+    identityEnabled: false,
+  },
+  {
+    id: 'rb-coruripe',
+    nome: 'RB Agrícola Coruripe (Em Transição)',
+    razaoSocial: 'R B Dantas Ltda - Filial Coruripe',
+    bandeira: 'RB_AGRICOLA',
+    cidade: 'Coruripe',
+    estado: 'AL',
+    endereco: 'Rodovia AL-101 Sul - Centro Operacional',
+    cep: '57230-000',
+    cnpj: '02.895.028/0021-03',
+    telefone: '82981188719',
+    telefoneFormatado: '(82) 98118-8719',
+    mapUrl: 'https://maps.app.goo.gl/KuiQSoJLRvEeAvGx6',
+    gerenteEmail: 'gerente.coruripe@grupocoagro.com.br',
+    horarioFuncionamento: 'Seg a Sex: 07h30 às 17h30 • Sáb: 07h30 às 12h',
+    tipo: 'filial',
+    ativo: false,
+    hasPetDepartment: false,
+    identityEnabled: false,
   },
 ];
 
 export function getCoagroStoreById(storeId: string | undefined): CoagroStore {
+  if (storeId === 'catedral' || storeId === '15-de-novembro') {
+    return COAGRO_STORES.find((s) => s.id === 'expedicionario') || COAGRO_STORES[0];
+  }
   return (
     COAGRO_STORES.find((s) => s.id === storeId) ||
-    COAGRO_STORES.find((s) => s.id === 'catedral') ||
+    COAGRO_STORES.find((s) => s.id === 'expedicionario') ||
     COAGRO_STORES[0]
   );
 }

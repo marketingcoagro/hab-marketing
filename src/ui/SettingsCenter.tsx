@@ -10,6 +10,7 @@ import type {
   ValidityPreset,
   VisualThemePreset,
 } from '../core/types';
+import { COAGRO_OFFICIAL_POSTER_ARCHETYPE } from '../core/types';
 import { BrandKitModal } from './BrandKitModal';
 import { ErpIntegrationModal } from './ErpIntegrationModal';
 import { SETTINGS_TABS, type SettingsTab } from './settingsTabs';
@@ -106,7 +107,7 @@ export const SettingsCenter: React.FC<SettingsCenterProps> = ({
       <div className="settings-header">
         <div>
           <div className="eyebrow">
-            <span className="eyebrow-line" /> CENTRAL DE CONFIGURAÇÕES
+            <span className="eyebrow-line" /> Painel de configurações
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Central de Configurações
@@ -318,23 +319,17 @@ export const SettingsCenter: React.FC<SettingsCenterProps> = ({
                       <option value="CAMPAIGN_SEASONAL">Campanha sazonal</option>
                     </select>
                   </Field>
-                  <Field label="Arquétipo do cartaz">
-                    <select
-                      value={posterConfig.layoutArchetype}
-                      onChange={(e) =>
-                        studioActions.setPosterLayoutArchetype(
-                          e.target.value as PosterLayoutArchetype
-                        )
-                      }
+                  <Field label="Modelo oficial do cartaz">
+                    <div
+                      className="settings-note"
+                      data-poster-template-active={COAGRO_OFFICIAL_POSTER_ARCHETYPE}
                     >
-                      <option value="PROMO_MODERN_V">01 · Varejo Pop (Pílula + Alto Contraste)</option>
-                      <option value="PROMO_CLASSIC_V">02 · Promo V Clássico (DE/POR)</option>
-                      <option value="CLEAN_DIRECT_PRICE">03 · Atacado / Só Preço Limpo</option>
-                      <option value="MACHINERY_INSTALLMENT">04 · Maquinário / Parcelado CDC</option>
-                      <option value="COMBO_ADVANTAGE">05 · Combo / Leve + Pague - (#10B981)</option>
-                      <option value="CONDITION_ADVANTAGE">06 · Condição Especial / Brinde</option>
-                      <option value="GRID_MULTIPRODUCT_4X">07 · Encarte Multiproduto (Grid 6x)</option>
-                    </select>
+                      <IconLock size={14} />
+                      <span>
+                        Padrão Oficial: <strong>Promo V Clássico</strong> — modelo único do Hub
+                        Coagro.
+                      </span>
+                    </div>
                   </Field>
                   <Field label="Modo de edição">
                     <select
@@ -454,7 +449,6 @@ export const SettingsCenter: React.FC<SettingsCenterProps> = ({
                     >
                       <option value="STORY_9_16">Story / Status · 9:16</option>
                       <option value="FEED_4_5">Feed · 4:5</option>
-                      <option value="SQUARE_1_1">Quadrado · 1:1</option>
                     </select>
                   </Field>
                   <Field label="Tema visual">

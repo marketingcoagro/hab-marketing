@@ -4,6 +4,162 @@ Todas as alterações relevantes, decisões técnicas e novas funcionalidades do
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [3.13.0-coagro-navigation] - 2026-11-11
+
+### Alterado
+- **NAV-01 (Campanhas como eixo principal):** criado o módulo `CAMPAIGNS` e movido o conteúdo de campanhas para uma página própria reutilizando o motor do Brand Hub, sem duplicar templates ou lógica.
+- **NAV-02 (Faixas e Rádio como submenus):** `Faixas e lonas` saiu do menu principal e passou para o submenu de Campanhas; `Rádio Coagro` também foi agrupado como mídia secundária.
+- **NAV-03 (Kit Colaborador em destaque):** Kit Colaborador passou a ser o primeiro item operacional abaixo de Campanhas e a primeira aba do Brand Hub, herdando o espaço que era ocupado por Campanhas.
+- **UX-DUP-01 (Fim da duplicação de cartão):** removida a prévia de cartão de visita do Kit Colaborador; o cartão existe somente na aba `Crachá e cartão`.
+- **UX-DUP-02 (Formulário único):** removido o formulário duplicado da aba `Crachá e cartão`; a aba agora lê os dados do Kit Colaborador e oferece `Editar no Kit Colaborador`.
+
+### Validado
+- `npx tsc --noEmit`.
+- `npm test`: 39/39.
+- `npx vite build`.
+- Teste de navegação desktop/mobile: Campanhas, Faixas, Rádio, Kit, edição compartilhada, zero overflow e zero erros de página.
+
+## [3.12.0-agent-browser-skill] - 2026-11-11
+
+### Adicionado
+- **DOCS-SKILL-03 (Agent Browser):** instalada a habilidade `agent-browser` via `npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser` em `.agents/skills/agent-browser`.
+- **DOCS-SKILL-04 (Lockfile de skills):** criado `skills-lock.json` para restaurar a habilidade com `npx skills experimental_install`.
+- **CHORE-ASSETS (Referências locais):** `marca e ideias/` excluída do Git; os logos de produção permanecem embutidos em `src/ui/coagroLogos.tsx`, sem dependência do diretório local de referências.
+
+## [3.11.0-coagro-mesa-de-prova] - 2026-11-11
+
+### Alterado
+- **DESIGN-01 (Mesa de prova Coagro):** reconstruída a camada visual global em `src/ui/styles/pulso-shell.css` com azul cobalto institucional, papel frio, malha técnica discreta, cantos de produção, tipografia Exo 2/Inter, foco dourado e sombras reservadas à prévia física.
+- **DESIGN-02 (Navegação e contexto):** `src/ui/Sidebar.tsx` virou um índice de produção azul com logo branca, unidade ativa, seções em caixa de frase e sem numeração artificial; `src/ui/Topbar.tsx` recebeu seletor de perfil compacto e legível.
+- **DESIGN-03 (Estúdio e prévia):** `src/App.tsx` ganhou cabeçalho editorial com descrição real do módulo, removeu o marcador de etapa isolado, encurtou os metadados e deu à prévia um palco de mesa de corte com réguas, papel e cantoneiras.
+- **DESIGN-04 (Brand Hub, Curadoria, Faixas e Landing):** Brand Hub ganhou capa cobalto, abas de materiais e fichas de produção; a Fila do Curador virou bandeja contínua de KPIs; Faixas & Lonas ganharam palco de mockup; a landing executiva foi alinhada à mesma família visual clara.
+- **DESIGN-05 (Tipografia de interface):** labels operacionais passaram a caixa de frase, títulos de seção usam Exo 2 e a leitura de dados usa Inter com contraste e tabular numbers.
+
+### Validado
+- `npx tsc --noEmit`: sem erros.
+- `npm test`: 39/39 testes aprovados.
+- `npx vite build`: concluído.
+- Revisão visual em desktop e mobile, sem overflow horizontal.
+
+## [3.10.0-coagro-frontend-design-skill] - 2026-11-11
+
+### Adicionado
+- **DOCS-SKILL-01 (Skill Frontend Design):** criado `.opencode/skills/frontend-design/SKILL.md` com o processo de direção visual, princípios de tipografia, cor, layout, movimento e escrita.
+- **DOCS-SKILL-02 (Brief específico do Hub Coagro):** criado `.opencode/skills/frontend-design/references/coagro-hub.md` com tokens, metáfora da mesa de prova, assinatura visual, anti-padrões e prioridades de redesenho.
+
+## [3.9.1-coagro-badge-official] - 2026-11-11
+
+### Alterado
+- **UI-BADGE-01 (Crachá na base oficial):** `src/ui/CoagroIdentityTemplates.tsx` reorganizou o crachá conforme a referência do Marketing: nome no topo, foto em painel branco, cargo abaixo, V institucional e base branca com a logo oficial. Foram removidos os ícones Agro/Pet/Casa/Jardim, a matrícula/telefone do rodapé e o selo `#AquiTodosVendem`.
+- **UI-BADGE-02 (Assinatura da base):** a base do crachá exibe somente a logo Coagro/Coagro Pet acompanhada de **“A força do campo!”**.
+- **BUG-FONT-01 (Tipografia no export):** nomes de família com espaço receberam aspas corretas em `src/ui/CoagroIdentityTemplates.tsx`, evitando fallback para fonte serifada no PNG.
+
+### Validado
+- Exportação real do crachá em PNG: `1200 × 1905 px`, sem erros de console.
+- `npx tsc --noEmit`: sem erros.
+
+## [3.9.0-coagro-profile-signature-standard] - 2026-11-11
+
+### Alterado
+- **UX-KIT-01 (Fluxo único no Kit Colaborador):** removido o gerador isolado `CoagroProfileGenerator.tsx`; Perfil 1:1 e Assinatura de E-mail agora são templates do arquivo padrão `src/ui/CoagroIdentityTemplates.tsx`, alimentados pelo mesmo formulário do Kit Colaborador em `src/ui/BrandHubView.tsx`.
+- **FEAT-SIGN-01 (Assinatura de E-mail Oficial):** criado `CoagroEmailSignatureTemplate` no padrão horizontal da referência, com fundo azul e pattern `Coagro`, recortes diagonais ouro/verde, nome em Exo 2, cargo em Inter, foto circular com moldura bicolor e bloco de logo branco no canto inferior direito.
+- **UI-KIT-02 (Controles centralizados):** zoom, posição horizontal/vertical, foto e toggle de nome/cargo foram movidos para o formulário padrão; alterações refletem simultaneamente no Perfil 1:1, na Assinatura e no Cartão.
+- **UI-KIT-03 (Exportação e HTML):** Perfil exporta PNG em 1080×1080 e Assinatura em 2000×496 pelo motor existente `exportElementToPng`; o botão `Copiar HTML` foi atualizado para uma versão de e-mail compatível com as cores e dados institucionais.
+
+### Corrigido
+- **BUG-KIT-01 (Tipografia de apoio):** textos de cargo e contato passaram a usar `Inter` com fallback `sans-serif`, evitando renderização em fonte serifada no arquivo exportado.
+- **BUG-KIT-02 (Consolidação de estado):** eliminado o formulário duplicado do gerador de perfil; os valores agora vêm de uma única fonte de estado no Kit Colaborador.
+
+## [3.8.0-coagro-profile-1080] - 2026-11-11
+
+### Adicionado
+- **FEAT-ID-03 (Perfil Institucional Coagro 1:1 — 1080×1080px):** criado `src/ui/CoagroProfileGenerator.tsx` e integrado na aba `Kit Colaborador` de `src/ui/BrandHubView.tsx`, renderizando em HTML5 Canvas (`1080×1080`) as 6 camadas especificadas: fundo radial azul com pattern `Coagro`, geometria diagonal nos cantos (`-32°`), logo oficial `Coagro` ou `Coagro Pet`, círculo interno iluminado com foto recortada (`zoom`, `offsetX` e `offsetY`), moldura circular tripla bicolor (`#FFAB00` / `#389838` + anel branco interno) e cápsula inferior opcional com Nome (`Exo 2` Bold) e Cargo (`Inter` Medium), com download nativo via `canvas.toDataURL('image/png')`.
+
+## [3.7.1-coagro-png-export] - 2026-11-11
+
+### Corrigido
+- **BUG-EXPORT-01 (PNG não baixava):** `src/engine/exporter.ts` agora escapa o CSS do Tailwind antes de inseri-lo no `<style>` do SVG. As at-rules `@property` usam `syntax: "<color>"`, e o `<` cru invalidava o XML do SVG.
+- **BUG-EXPORT-02 (Canvas tainted no Chromium):** o SVG serializado passou a ser carregado por `data:` URI em vez de `blob:`; com `<foreignObject>`, o Chromium marcava o canvas como cross-origin e bloqueava o `toBlob`.
+- **Validação real:** download confirmado para Cartaz A4, Story 1080p, Crachá e Cartão de Visita, com assinatura PNG válida e ausência de erros de página.
+
+## [3.7.0-coagro-phase2] - 2026-11-11
+
+### Alterado
+- **UI-TEMPLATE-01 (Single-Template Standard):** `src/core/types.ts` criou o catálogo `COAGRO_POSTER_TEMPLATE_CATALOG` com apenas `PROMO_CLASSIC_V` habilitado; os demais arquétipos permanecem tipados e renderizáveis, mas marcados com `enabled: false` e `hidden: true`.
+- **UI-TEMPLATE-02 (Curadoria do Módulo 1):** `src/core/store.ts` mantém o arquétipo oficial em todas as entradas (Smart Paste, ERP, mecânicas e lote), bloqueia a troca por modelos inativos e `src/App.tsx` substituiu o seletor por um badge fixo `Modelo Oficial: Promo V Clássico`.
+- **UI-PREVIEW-01 (Barras Enxutas):** `src/App.tsx` removeu da barra do Módulo 1 os controles redundantes de selo/preço por medida (mantidos na Central de Configurações), restringiu o Módulo 3 a `Story` e `Feed` e removeu `1:1` também das preferências.
+- **UI-LAYOUT-01 (Comunicados & Faixas):** o Smart Paste comercial deixa de ser renderizado em `HR_NOTICE` e a marca d'água de cotação em `src/ui/SpecialRequestsView.tsx` foi reduzida para `opacity-[0.045]`.
+- **UI-SETTINGS-01 (Central de Identidade):** `src/ui/BrandKitModal.tsx` ocultou os presets de segmento e o seletor tipográfico, exibindo o par travado `Exo 2 + Inter`; a área de logo passou a mostrar o ativo oficial Coagro/Coagro Pet e o seletor de setores exibe apenas identidades ativas e vocabulário operacional.
+- **UI-NAV-01 (Sidebar e Terminologia):** `src/ui/Sidebar.tsx` numerou os módulos operacionais de 1 a 7, usa `Nossas Unidades · Filial Ativa` e permite duas linhas para o nome da unidade; `src/ui/styles/pulso-shell.css` evita o truncamento prematuro.
+- **UI-COPY-01 (Padronização de Textos):** o nome da marca em Configurações passou a `Nome do Grupo / Nossas Unidades`, o subtítulo de RH foi atualizado e a Fila do Curador agora referencia `Grupo Coagro e Coagro Pet` e as `15 Unidades Coagro`.
+
+## [3.6.0-coagro-phase1] - 2026-11-11
+
+### Corrigido
+- **BUG-STATE-01 (Fallback de Identidade):** `src/core/store.ts` migra silenciosamente lojas/estados salvos de `RB_AGRICOLA`, unidades antigas e departamentos inativos para Coagro ou Coagro Pet, preservando os objetos legados para leitura de backups e fila.
+- **BUG-RENDER-01 (Logos Nativas):** `src/engine/PosterAndSocialCanvas.tsx` injeta logos SVG oficiais no Social e no Carrossel mesmo sem `defaultLogoUrl`; o fallback social sem foto foi substituído por composição tipográfica institucional e o RH saneia parêntese órfão no nome exibido.
+- **BUG-RENDER-02 (Colisão do Carrossel):** o badge de departamento da capa deixou o posicionamento absoluto e passou ao fluxo flex, evitando sobreposição com o título.
+- **BUG-ORTHO-01 (Falso Positivo):** `src/core/coagroDictionary.ts` ampliou o vocabulário comum com termos portugueses como `completa`, `completo` e `selecionados`, sem alterar a inspeção de marcas/princípios ativos.
+- **BUG-RADIO-01 (Unidade do Spot):** `src/core/store.ts` e `src/ui/SpecialRequestsView.tsx` sincronizam filial ativa, `targetStoreIds`, checkbox de menção e texto do teleprompter.
+
+### Alterado
+- **GOV-BRAND-01 (Tipografia Oficial):** `src/core/types.ts`, `src/core/store.ts` e `src/core/businessRules.ts` travam o motor em Exo 2 para títulos/preços e Inter para apoio/rodapé; presets white-label antigos continuam tipados, porém inativos para novas aplicações.
+- **GOV-BRAND-02 (Campanha Sazonal):** `src/App.tsx` exibe a campanha ativa nos módulos de Cartazes e Anúncios, com ação direta para desativá-la e retornar ao cabeçalho institucional.
+- **GOV-BRAND-03 (Identidades Oficiais):** `src/core/coagroStores.ts`, `src/ui/Sidebar.tsx` e `src/ui/BrandHubView.tsx` marcam RB Agrícola como identidade inativa e restringem os seletores ativos a Coagro/Coagro Pet sem remover registros históricos.
+
+## [3.5.0-coagro-brand-system] - 2026-11-11
+
+### Adicionado
+- **FEAT-BRAND-01 (Sistema Visual e Governança Coagro):** Criado `docs/COAGRO_BRAND_GOVERNANCE.md` com diagnóstico, análise das referências locais, tokens oficiais, regras de composição, critérios de aceite e roadmap de templates por categoria.
+- **FEAT-ID-01 (Crachá Corporativo Oficial):** Criado `CoagroBadgeTemplate` em `src/ui/CoagroIdentityTemplates.tsx`, com composição determinística inspirada na referência local (fundo azul, painel branco, faixa em V e base institucional), foto com recorte fixo, matrícula, unidade e exportação PNG no Brand Hub.
+- **FEAT-ID-02 (Cartão de Visita Oficial):** Criado `CoagroBusinessCardTemplate` em `src/ui/CoagroIdentityTemplates.tsx`, com proporção 9×5 cm, área protegida de logo, recorte geométrico Coagro e slots controlados para nome, cargo, setor e contatos.
+- **FEAT-UX-01 (Campos Controlados de Identificação):** Adicionada a aba `Crachá & Cartão Oficial` em `src/ui/BrandHubView.tsx`, com limites de caracteres, pré-visualização fiel e ações reais de exportação para os dois modelos homologados.
+
+### Alterado
+- **UX-VIS-01 (Brand Hub Editorial):** Adicionados tokens e componentes visuais dedicados em `src/ui/styles/pulso-shell.css` para a hierarquia do Brand Hub, tabs acessíveis e formulário de identificação sem edição livre.
+- **UX-VIS-02 (Sidebar e RH):** Corrigida a logo branca sobre Sidebar clara em `src/ui/Sidebar.tsx`; `HrAndNoticeCanvas` em `src/engine/PosterAndSocialCanvas.tsx` passou a aplicar logo oficial, bordas vinculadas à paleta, `data-hr-channel` e cabeçalho consistente por canal.
+- **UX-GOV-01 (Proteção contra Sobreposição):** Aplicados limites de caracteres aos campos de RH em `src/App.tsx` e aos dados de papelaria em `src/ui/BrandHubView.tsx`, mantendo o layout determinístico e os contratos semânticos existentes.
+
+## [3.4.0-coagro-hub-visual-refinement] - 2026-11-10
+
+### Adicionado
+- **FEAT-41 (Inversão da Hierarquia de Cores no Agro & Blindagem Pet)**:
+  - Definida a nova paleta Agro: Primária Titular em Azul Oficial da Logotipo Coagro (`#002B49`), Secundária em Verde-Safra Institucional (`#004d40`) e Acentos/Preço em Dourado / Amarelo Ouro (`#ffab00`) em `src/core/types.ts` e `src/core/store.ts`.
+  - Blindagem mantida para a bandeira Coagro Pet (`#001C71` / `#4897D0`), isolada estritamente aos setores/lojas Pet homologados.
+  - Migração profunda em `loadInitialState()` de `src/core/store.ts` para sincronizar automaticamente `dept-1` e sanear instâncias salvas no navegador.
+- **FEAT-42 (Limpeza do Rodapé de PDV, Logo Vetorizada Oficial & WhatsApp da Filial)**:
+  - Removido o código técnico visível `• #{metrics.forensicId}` do rodapé dos cartazes em `src/engine/PosterAndSocialCanvas.tsx` (`SingleStorePosterUnit`), preservando a rastreabilidade interna no atributo `data-forensic-id`, no log de auditoria e no modal `REQ-XXXX`.
+  - Substituído o texto estático "Grupo Coagro" pela Logo Oficial Vetorizada em SVG (`LogoHorizontalAzul` / `LogoHorizontalMonoPreta` para modo Toner / `CoagroPetLogo` para Pet).
+  - Inserido ícone oficial do WhatsApp ao lado do número formatado e nome da filial ativa (`brandKit.defaultPhoneWhatsapp` e `brandKit.defaultBranchName`).
+  - Saneamento da chamada de balcão em `src/core/businessRules.ts` (`SmartProductEnricherService`), focando em atendimento presencial exclusivo na filial.
+- **FEAT-43 (Atualização do Diretório de Unidades, Boot em Expedicionário & Flag Pet Condicional)**:
+  - Adicionadas as propriedades `ativo: boolean` e `hasPetDepartment: boolean` na interface `CoagroStore` em `src/core/coagroStores.ts`.
+  - Lojas desativadas (`Coagro Catedral` e `Coagro 15 de Novembro`) removidas da listagem ativa. Adicionadas unidades RB Agrícola em transição (`rb-propria` e `rb-coruripe`) com `ativo: false`.
+  - `Coagro Expedicionário` definida como filial padrão de inicialização no estado global e fallback resiliente em `getCoagroStoreById`.
+  - Seletor de departamentos na `Sidebar.tsx` adaptativo: filiais 100% agro ocultam a bandeira Pet para evitar ruído e emissões incorretas no balcão.
+- **FEAT-44 (Brand Hub & Media Library 360° com Pacotes de Campanha)**:
+  - Aba `'campaigns'` promovida a Tab 1 e padrão de abertura no `BrandHubView.tsx`.
+  - Painel Criativo Dinâmico 360° estruturado por campanha ativa (**Saldão Coagro**, **Black Friday Coagro**, **Sabadão do Produtor**, **Fecha Mês Coagro** e **Natal Coagro**):
+    - Visualização e download de 3 variações de Stories em 1080×1920 PNG;
+    - Grade de Vídeos Promocionais filtrável por departamento (Nutrição Animal, Defensivos, Máquinas e Pet);
+    - Spots de Rádio em MP3 prontos para execução no som ambiente ou download;
+    - Botões de injeção em 1 clique `"⚡ Gerar Cartaz Desta Campanha"` e `"📱 Gerar Anúncio de Loja"`.
+  - Destaque para Galeria de Produtos Homologados com PNG transparente e cópia rápida de dados fiscais/CNPJ.
+- **FEAT-45 (Spots da Rádio Coagro com Interruptor de Menção de Loja)**:
+  - Adicionado campo `mentionStoreName?: boolean` a `RadioSpotDraft` em `src/core/types.ts` e `src/core/store.ts`.
+  - Atualizada a função `buildRadioSpotScript` em `src/core/businessRules.ts` para alternar entre chamada local com a unidade ativa (ex: *"Aqui na Coagro Expedicionário"*) e chamada institucional de rede (*"todas as lojas do Grupo Coagro"*).
+  - Incluído toggle direto com feedback textual no formulário da Rádio Coagro em `src/ui/SpecialRequestsView.tsx`.
+- **FEAT-46 (Classificação de Canal & Regra Estrita de Preto e Branco para RH/Mural)**:
+  - Adicionado `channel: HrNoticeChannel` (`MURAL_A4`, `SOCIAL_INTERNAL`, `BOARD_FORMAL`) em `src/core/types.ts` e seletor com 3 cards no formulário de `HR_NOTICE` em `src/App.tsx`.
+  - Opção P&B (Toner Eco) travada e restrita exclusivamente ao canal Mural Físico A4 (`MURAL_A4` + `A4_PRINT`). Formatos digitais para redes sociais e comunicados da diretoria renderizam automaticamente na paleta colorida oficial em `PosterAndSocialCanvas.tsx`.
+- **FEAT-47 (Despoluição da Interface & Unificação de Perfil)**:
+  - Removidos bloco duplicado de perfil e botão de ajuda no rodapé da `src/ui/Sidebar.tsx`.
+  - Chip unificado de perfil no cabeçalho superior (`src/ui/Topbar.tsx`) exibindo perfil ativo, filial e tooltip com e-mail/contato institucional.
+  - Travada e ocultada a opção de Geração em Lote (`batchMode`) para o perfil `OPERATOR` em `src/App.tsx`, com liberação de download direto (PDF e PNG) para ofertas regulares na Via Verde.
+- **FEAT-48 (Expansão da Suíte de Testes Automatizados)**:
+  - Adicionado `TEST-39` em `scripts/audit.mjs` validando inversão da paleta Agro, lojas ativas, flags de Pet, injeção das 5 campanhas, roteirizador de rádio adaptativo e fallback de IDs desativados.
+  - **Suíte de Testes Automatizados**: **39/39 testes aprovados (100%)** com compilação de produção Vite limpa em 1.10s.
+
 ## [3.3.0-coagro-hub-mvp-complete] - 2026-11-10
 
 ### Adicionado

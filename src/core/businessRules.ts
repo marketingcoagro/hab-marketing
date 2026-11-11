@@ -1481,6 +1481,7 @@ export interface WhiteLabelTypographyPreset {
   segmentHint: string;
   fontHeading: string;
   fontBody: string;
+  enabled?: boolean;
 }
 
 export const WHITE_LABEL_TYPOGRAPHY_PRESETS: WhiteLabelTypographyPreset[] = [
@@ -1490,6 +1491,7 @@ export const WHITE_LABEL_TYPOGRAPHY_PRESETS: WhiteLabelTypographyPreset[] = [
     segmentHint: 'Padrão multi-segmento de leitura ultra-rápida a 2m',
     fontHeading: "'Montserrat', 'Arial Black', sans-serif",
     fontBody: "'Inter', system-ui, sans-serif",
+    enabled: false,
   },
   {
     id: 'AGRO_ROBUST',
@@ -1497,6 +1499,7 @@ export const WHITE_LABEL_TYPOGRAPHY_PRESETS: WhiteLabelTypographyPreset[] = [
     segmentHint: 'Condensada forte ideal para máquinas, peças e cooperativas',
     fontHeading: "'Oswald', 'Impact', 'Arial Narrow', sans-serif",
     fontBody: "'Roboto', system-ui, sans-serif",
+    enabled: false,
   },
   {
     id: 'RETAIL_CLASSIC',
@@ -1504,6 +1507,7 @@ export const WHITE_LABEL_TYPOGRAPHY_PRESETS: WhiteLabelTypographyPreset[] = [
     segmentHint: 'Geométrica amigável para giro diário, padaria e hortifrúti',
     fontHeading: "'Poppins', 'Arial Black', sans-serif",
     fontBody: "'Open Sans', system-ui, sans-serif",
+    enabled: false,
   },
   {
     id: 'TECH_PRECISION',
@@ -1511,6 +1515,7 @@ export const WHITE_LABEL_TYPOGRAPHY_PRESETS: WhiteLabelTypographyPreset[] = [
     segmentHint: 'Alta precisão para defensivos, medicamentos e atacado',
     fontHeading: "'Archivo Black', 'Impact', sans-serif",
     fontBody: "'Public Sans', system-ui, sans-serif",
+    enabled: false,
   },
 ];
 
@@ -2423,7 +2428,7 @@ export class SmartProductEnricherService implements ProductEnricherPort {
             : 'Excelente rendimento diário',
         ],
         detectedCategory: category,
-        suggestedCta: 'Garanta na loja ou peça pelo WhatsApp!',
+        suggestedCta: 'Oferta exclusiva na loja • Fale com nosso balcão',
         confidenceScore: 0.92,
       };
     }
@@ -2461,7 +2466,7 @@ export class SmartProductEnricherService implements ProductEnricherPort {
           'Pronta entrega para retirada na filial',
         ],
         detectedCategory: category,
-        suggestedCta: 'Consulte nosso time técnico no WhatsApp!',
+        suggestedCta: 'Consulte nosso time técnico presencialmente!',
         confidenceScore: 0.91,
       };
     }
@@ -2478,7 +2483,7 @@ export class SmartProductEnricherService implements ProductEnricherPort {
         'Disponível para retirada imediata',
       ],
       detectedCategory: category,
-      suggestedCta: 'Aproveite na loja ou peça pelo WhatsApp!',
+      suggestedCta: 'Oferta exclusiva para retirada na loja!',
       confidenceScore: 0.85,
     };
   }
@@ -2884,23 +2889,31 @@ export function estimateRadioSpotTiming(
 /**
  * Pré-estrutura um roteiro comercial padronizado (Seção 8.2 do PDF) para a Rádio Coagro (Spotifast).
  */
-export function buildRadioSpotScript(draft: Pick<
-  RadioSpotDraft,
-  'spotType' | 'durationSeconds' | 'productOrSubject' | 'priceText'
->, storeName: string): string {
-  const cleanStore = storeName || 'Coagro';
+export function buildRadioSpotScript(
+  draft: Pick<
+    RadioSpotDraft,
+    'spotType' | 'durationSeconds' | 'productOrSubject' | 'priceText' | 'mentionStoreName'
+  >,
+  storeName: string
+): string {
+  const shouldMention = draft.mentionStoreName !== false;
+  const storeReference = shouldMention ? (storeName || 'Coagro') : 'todas as lojas do Grupo Coagro';
   const prod = draft.productOrSubject || 'Oferta Especial';
   const price = draft.priceText ? ` por apenas ${draft.priceText}` : ' com condição especial de balcão';
 
   if (draft.spotType === 'STORE_HOURS') {
-    return `Atenção, cliente amigo da ${cleanStore}! Confira o nosso comunicado especial: ${prod}. Conte sempre com a assessoria técnica e o atendimento de confiança do Grupo Coagro!`;
+    return shouldMention
+      ? `Atenção, cliente amigo da ${storeReference}! Confira o nosso comunicado especial: ${prod}. Conte sempre com a assessoria técnica e o atendimento de confiança do Grupo Coagro!`
+      : `Atenção, cliente amigo! Confira o comunicado especial em ${storeReference}: ${prod}. Conte sempre com a assessoria técnica e o atendimento de confiança do Grupo Coagro!`;
   }
 
   if (draft.durationSeconds === 15) {
-    return `Alô, produtor! Aproveite agora na ${cleanStore}: ${prod}${price}! Passe no balcão ou chame no WhatsApp da loja. Coagro, a força do campo com você!`;
+    return shouldMention
+      ? `Alô, produtor! Aproveite agora na ${storeReference}: ${prod}${price}! Passe no balcão ou chame no WhatsApp da loja. Coagro, a força do campo com você!`
+      : `Alô, produtor! Aproveite agora em ${storeReference}: ${prod}${price}! Passe no balcão ou chame no WhatsApp da sua unidade. Coagro, a força do campo com você!`;
   }
 
-  return `Atenção, amigo produtor e cliente da ${cleanStore}! Chegou a hora de garantir economia de verdade para a sua propriedade. Aproveite ${prod}${price}! Estoque pronto para retirada imediata no balcão ou entrega rápida. Fale agora com um de nossos consultores técnicos na ${cleanStore}. Grupo Coagro, quem planta confiança colhe resultado!`;
+  return shouldMention
+    ? `Atenção, amigo produtor e cliente da ${storeReference}! Chegou a hora de garantir economia de verdade para a sua propriedade. Aproveite ${prod}${price}! Estoque pronto para retirada imediata no balcão ou entrega rápida. Fale agora com um de nossos consultores técnicos na ${storeReference}. Grupo Coagro, quem planta confiança colhe resultado!`
+    : `Atenção, amigo produtor e cliente do Grupo Coagro! Chegou a hora de garantir economia de verdade para a sua propriedade. Aproveite ${prod}${price}! Estoque pronto para retirada imediata no balcão ou entrega rápida em ${storeReference}. Fale agora com nossos consultores técnicos. Grupo Coagro, quem planta confiança colhe resultado!`;
 }
-
-

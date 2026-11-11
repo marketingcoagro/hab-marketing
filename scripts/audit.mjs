@@ -688,7 +688,7 @@ test('TEST-33: Sprint 3 Global Campaigns & Homologated Media Library Studio Inje
   assert.equal(stateAfterPoster.activeModule, 'STORE_POSTER');
   assert.equal(stateAfterPoster.brandKit.activeCampaignId, 'camp-saldao');
   assert.equal(stateAfterPoster.posterConfig.visualTheme, 'CAMPAIGN_SEASONAL');
-  assert.equal(stateAfterPoster.brandKit.alertPrimaryColorHex, '#004d40');
+  assert.equal(stateAfterPoster.brandKit.alertPrimaryColorHex, '#002B49');
   assert.equal(stateAfterPoster.brandKit.alertAccentColorHex, '#ffab00');
 
   // Testa injeção no Módulo de Redes Sociais
@@ -808,6 +808,78 @@ test('TEST-38: Sprint 8 Homologação de produto customizado com foto e injeçã
   assert.equal(updatedOffer.priceToRaw, 279.9);
   assert.equal(updatedOffer.productImageUrl, saved.productImageUrl);
   assert.equal(updatedOffer.imageUrl, saved.productImageUrl);
+});
+
+test('TEST-39: Sprint v3.4 Master Plan (Agro palette inversion, Expedicionário default, Pet flag, 5 Campaigns, Radio toggle)', () => {
+  // 1. Expedicionário é a loja padrão e lojas desativadas foram removidas da lista ativa
+  const stores = coagroStores.COAGRO_STORES;
+  assert.ok(stores.length >= 15);
+  assert.equal(stores.some((s) => s.id === 'catedral'), false, 'Catedral deve ter sido removida da listagem ativa');
+  assert.equal(stores.some((s) => s.id === '15-de-novembro'), false, '15 de Novembro deve ter sido removida');
+
+  // getCoagroStoreById mapeia com segurança IDs desativados para Expedicionário
+  const fallbackStore = coagroStores.getCoagroStoreById('catedral');
+  assert.equal(fallbackStore.id, 'expedicionario');
+
+  // 2. Flags ativo e hasPetDepartment presentes
+  const expedicionario = coagroStores.getCoagroStoreById('expedicionario');
+  assert.equal(expedicionario.ativo, true);
+  assert.equal(expedicionario.hasPetDepartment, true);
+
+  const delmiro = coagroStores.getCoagroStoreById('delmiro');
+  assert.equal(delmiro.hasPetDepartment, false);
+
+  const propria = stores.find((s) => s.id === 'rb-propria');
+  assert.ok(propria);
+  assert.equal(propria.ativo, false, 'Unidade RB Agrícola em transição deve ter ativo: false');
+
+  // 3. Hierarquia de cores invertida no Agro (Azul Primária, Verde Secundária, Ouro Acento)
+  const deptAgro = store.getStudioState().brandKit.departments.find((d) => d.id === 'dept-1');
+  assert.ok(deptAgro);
+  assert.equal(deptAgro?.primaryColorHex, '#002B49');
+  assert.equal(deptAgro?.secondaryColorHex, '#004d40');
+  assert.equal(deptAgro?.accentColorHex, '#ffab00');
+
+  // Coagro Pet continua isolado
+  const deptPet = store.getStudioState().brandKit.departments.find((d) => d.id === 'dept-2');
+  assert.equal(deptPet?.primaryColorHex, '#001C71');
+  assert.equal(deptPet?.secondaryColorHex, '#4897D0');
+
+  // 4. Todas as 5 campanhas oficiais pré-aprovadas presentes
+  const campaigns = store.getStudioState().brandKit.seasonalCampaigns;
+  assert.equal(campaigns.length >= 5, true);
+  const campIds = campaigns.map((c) => c.id);
+  assert.ok(campIds.includes('camp-saldao'));
+  assert.ok(campIds.includes('camp-black-friday'));
+  assert.ok(campIds.includes('camp-sabadao'));
+  assert.ok(campIds.includes('camp-fechames'));
+  assert.ok(campIds.includes('camp-natal'));
+
+  // 5. Rádio Coagro toggle mentionStoreName
+  const scriptWithStore = rules.buildRadioSpotScript(
+    {
+      spotType: 'PRODUCT_OFFER',
+      durationSeconds: 15,
+      productOrSubject: 'Bovigold 25kg',
+      priceText: 'R$ 89,90',
+      mentionStoreName: true,
+    },
+    'Coagro Expedicionário'
+  );
+  assert.ok(scriptWithStore.includes('Coagro Expedicionário'));
+
+  const scriptWithoutStore = rules.buildRadioSpotScript(
+    {
+      spotType: 'PRODUCT_OFFER',
+      durationSeconds: 15,
+      productOrSubject: 'Bovigold 25kg',
+      priceText: 'R$ 89,90',
+      mentionStoreName: false,
+    },
+    'Coagro Expedicionário'
+  );
+  assert.ok(scriptWithoutStore.includes('todas as lojas do Grupo Coagro'));
+  assert.ok(!scriptWithoutStore.includes('Coagro Expedicionário'));
 });
 
 console.log('\n======================================================');

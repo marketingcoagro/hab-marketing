@@ -5,7 +5,6 @@ import { COAGRO_STORES, getCoagroStoreById } from '../core/coagroStores';
 import { LogoHorizontalBranca, CoagroSimboloCasinha } from './coagroLogos';
 import {
   IconCarousel,
-  IconHelp,
   IconMegaphone,
   IconPoster,
   IconSettings,
@@ -33,14 +32,12 @@ const MODULES: {
   badge?: string;
   icon: React.FC<{ size?: number }>;
 }[] = [
-  { id: 'STORE_POSTER', label: '1. Cartazes de PDV', badge: 'Via Verde', icon: IconPoster },
-  { id: 'BANNER_FAIXA', label: '2. Faixas & Lonas', badge: 'Cotação', icon: IconSparkles },
-  { id: 'SOCIAL_MEDIA', label: '3. Anúncios Loja (Zap)', icon: IconMegaphone },
-  { id: 'CAROUSEL', label: 'Carrossel de Ofertas', icon: IconCarousel },
-  { id: 'BRAND_HUB', label: '4. Kit Colaborador & Marca', icon: IconUsers },
-  { id: 'RADIO_SPOT', label: '5. Rádio Coagro (:8790)', icon: IconMegaphone },
-  { id: 'HR_NOTICE', label: 'Comunicados & Mural A4', icon: IconUsers },
-  { id: 'CURATOR_QUEUE', label: 'Fila do Curador (Kaio)', icon: IconShield },
+  { id: 'BRAND_HUB', label: 'Kit Colaborador', icon: IconUsers },
+  { id: 'STORE_POSTER', label: 'Cartazes de PDV', badge: 'Via verde', icon: IconPoster },
+  { id: 'SOCIAL_MEDIA', label: 'Anúncios da loja', icon: IconMegaphone },
+  { id: 'CAROUSEL', label: 'Carrossel', icon: IconCarousel },
+  { id: 'HR_NOTICE', label: 'Comunicados', icon: IconUsers },
+  { id: 'CURATOR_QUEUE', label: 'Fila do Curador', icon: IconShield },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -76,19 +73,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClick={() => select('STORE_POSTER')}
         aria-label={`Ir para o ${COAGRO_HUB_BRAND.name}`}
       >
-        <LogoHorizontalBranca className="h-8 w-auto max-w-[180px]" />
+        <LogoHorizontalBranca className="h-10 w-auto max-w-[196px]" />
       </button>
 
-      <p className="sidebar-label">UNIDADE / FILIAL ATIVA</p>
+      <p className="sidebar-label">Unidade ativa</p>
 
       <div className="workspace-card space-y-2.5">
         <div className="workspace-top">
-          <span className="workspace-avatar bg-[#004d40] text-[#ffab00]" aria-hidden="true">
+          <span className="workspace-avatar" aria-hidden="true">
             <CoagroSimboloCasinha className="w-5 h-5" />
           </span>
           <span className="workspace-copy">
-            <strong>{activeStore.nome}</strong>
-            <span>
+            <strong title={activeStore.nome}>{activeStore.nome}</strong>
+            <span title={`${activeStore.cidade}/${activeStore.estado} • ${activeStore.telefoneFormatado}`}>
               {activeStore.cidade}/{activeStore.estado} • {activeStore.telefoneFormatado}
             </span>
           </span>
@@ -96,15 +93,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div>
           <label htmlFor="sidebar-store-select" className="sr-only">
-            Selecionar Filial Coagro
+            Selecionar unidade Coagro
           </label>
           <select
             id="sidebar-store-select"
             value={activeStoreId}
             onChange={(e) => studioActions.setActiveStore(e.target.value)}
-            className="w-full rounded-lg bg-slate-900/90 border border-slate-700 text-white px-2.5 py-1.5 text-[11px] font-bold cursor-pointer focus:outline-none focus:border-[#ffab00]"
+            className="workspace-select"
           >
-            {COAGRO_STORES.map((st) => (
+            {COAGRO_STORES.filter(
+              (st) => st.ativo !== false && st.identityEnabled !== false && st.bandeira !== 'RB_AGRICOLA'
+            ).map((st) => (
               <option key={st.id} value={st.id}>
                 {st.nome} ({st.cidade}/{st.estado})
               </option>
@@ -114,7 +113,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {brandKit.enableSubDepartments !== false && (
           <div className="workspace-departments" role="group" aria-label="Bandeira ativa">
-            {brandKit.departments.map((dept) => {
+            {brandKit.departments
+              .filter(
+                (dept) =>
+                  dept.enabled !== false &&
+                  (dept.id === 'dept-1' || (dept.id === 'dept-2' && activeStore.hasPetDepartment))
+              )
+              .map((dept) => {
               const active = dept.id === activeDept?.id;
               return (
                 <button
@@ -138,8 +143,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      <p className="sidebar-label">MÓDULOS DO HUB COAGRO</p>
+      <p className="sidebar-label">Materiais e operação</p>
       <nav className="side-nav" aria-label="Menu principal">
+        <button
+          type="button"
+          className={`side-link side-link--campaigns${
+            activeModule === 'CAMPAIGNS' ||
+            activeModule === 'BANNER_FAIXA' ||
+            activeModule === 'RADIO_SPOT'
+              ? ' side-link--active'
+              : ''
+          }`}
+          aria-current={activeModule === 'CAMPAIGNS' ? 'page' : undefined}
+          onClick={() => select('CAMPAIGNS')}
+        >
+          <span className="flex items-center gap-2.5 truncate">
+            <IconSparkles size={16} />
+            <span className="truncate">Campanhas</span>
+          </span>
+          <span className="side-badge side-badge--gold">Oficial</span>
+        </button>
+
+        <div className="side-subnav" role="group" aria-label="Campanhas">
+          <button
+            type="button"
+            className={`side-link side-link--sub${
+              !isSettings && activeModule === 'BANNER_FAIXA' ? ' side-link--active' : ''
+            }`}
+            aria-current={activeModule === 'BANNER_FAIXA' ? 'page' : undefined}
+            onClick={() => select('BANNER_FAIXA')}
+          >
+            <span className="side-subtree-mark" aria-hidden="true" />
+            <span>Faixas e lonas</span>
+          </button>
+          <button
+            type="button"
+            className={`side-link side-link--sub${
+              !isSettings && activeModule === 'RADIO_SPOT' ? ' side-link--active' : ''
+            }`}
+            aria-current={activeModule === 'RADIO_SPOT' ? 'page' : undefined}
+            onClick={() => select('RADIO_SPOT')}
+          >
+            <span className="side-subtree-mark" aria-hidden="true" />
+            <span>Rádio Coagro</span>
+          </button>
+        </div>
+
         {MODULES.map(({ id, label, badge, icon: Icon }) => {
           const active = !isSettings && activeModule === id;
           const isQueue = id === 'CURATOR_QUEUE';
@@ -156,13 +205,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="truncate">{label}</span>
               </span>
               {isQueue && pendingRequestsCount > 0 ? (
-                <span className="px-1.5 py-0.5 rounded-full bg-[#ffab00] text-slate-950 text-[10px] font-black shrink-0">
-                  {pendingRequestsCount}
-                </span>
+                <span className="side-count">{pendingRequestsCount}</span>
               ) : badge ? (
-                <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold uppercase shrink-0">
-                  {badge}
-                </span>
+                <span className="side-badge">{badge}</span>
               ) : null}
             </button>
           );
@@ -178,7 +223,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
         >
           <IconSettings size={16} />
-          <span>Configurações &amp; Base ERP</span>
+          <span>Configurações</span>
           {isSettings && <i aria-hidden="true" />}
         </button>
       </nav>
@@ -191,7 +236,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <div className="freemium-top">
             <span className="free-dot" aria-hidden="true" />
-            GOVERNANÇA DETERMINÍSTICA
+            Governança ativa
           </div>
           <div className="freemium-count">
             <strong>{pendingRequestsCount}</strong>
@@ -202,7 +247,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </div>
           <p>
-            Identidade travada (#004d40 / #ffab00). Zero alucinação de IA generativa.
+            Identidade oficial Coagro e Coagro Pet. Peças fora do padrão entram na fila de curadoria.
           </p>
           <button
             type="button"
@@ -211,27 +256,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <IconShield size={11} /> Abrir Painel do Curador
           </button>
-        </div>
-
-        <button type="button" className="help-link" onClick={onOpenHelp}>
-          <IconHelp size={14} />
-          Ajuda e atalhos do sistema
-        </button>
-
-        <div className="profile-row">
-          <span className="profile-avatar" aria-hidden="true">
-            {userRole === 'CURATOR_ADMIN' ? 'KV' : userRole === 'STORE_MANAGER' ? 'GE' : 'OP'}
-          </span>
-          <span className="profile-copy">
-            <strong>
-              {userRole === 'CURATOR_ADMIN'
-                ? 'Kaio Virgínio (Curador)'
-                : userRole === 'STORE_MANAGER'
-                  ? `Gerente • ${activeStore.nome.replace('Coagro ', '')}`
-                  : 'Operador de Balcão'}
-            </strong>
-            <span>{activeStore.gerenteEmail}</span>
-          </span>
         </div>
       </div>
     </aside>

@@ -41,3 +41,6 @@ screenshots/*.png
 # Reference design sandbox (interface legal)
 interface legal/
 *.zip
+
+# Brand references and raw assets (local only; runtime logos live in src/ui/coagroLogos.tsx)
+marca e ideias/

@@ -127,6 +127,8 @@ const COMMON_PORTUGUESE_RETAIL_VOCAB = new Set([
   'juros', 'gratis', 'grátis', 'brinde', 'exclusivo', 'compre', 'ganhe', 'leve', 'pague', 'unidade', 'unidades',
   'kg', 'g', 'mg', 'l', 'lt', 'ml', 'un', 'sc', 'cx', 'pct', 'fd', 'gl', 'fr', 'doses', 'metros', 'm', 'cm', 'mm',
   'alta', 'absorcao', 'absorção', 'pelagem', 'saudavel', 'saudável', 'nutricao', 'nutrição', 'balanceada',
+  'completa', 'completo', 'completas', 'completos', 'principal', 'principais', 'selecionado', 'selecionados',
+  'especializada', 'especializado', 'qualidade', 'linha', 'linhas', 'produto', 'produtos', 'modelo', 'modelos',
   'palatabilidade', 'digestibilidade', 'rico', 'vitaminas', 'minerais', 'essenciais', 'embalagem', 'economica',
   'econômica', 'garanta', 'ja', 'já', 'seu', 'sua', 'loja', 'filial', 'whatsapp', 'entrega', 'imediata', 'retirada',
   'consulte', 'nosso', 'time', 'tecnico', 'técnico', 'arame', 'farpado', 'ovalado', 'galvanizado', 'bota',
